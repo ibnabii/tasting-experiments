@@ -1,0 +1,33 @@
+@startuml "conceptual_model"
+
+entity Product{
+}
+
+entity Experiment{
+}
+
+entity Researcher{
+}
+
+entity Panelist{
+}
+
+entity "Individual result" as indResult{
+}
+entity "Panel result" as panResult{
+}
+
+entity Panel
+entity Sample
+
+Researcher "1" --> "0..*" Experiment :plans
+Experiment "1" --> "2" Product :tests
+Experiment "1" --> "0..*" Panel :has
+Panelist "1" --> "0..*" Sample :tastes
+Panelist "1" --> "0..*" indResult :provides
+indResult "0..1" -- "3" Sample
+Panel "1" -- "0..*" indResult
+Sample "0..*" --> "1" Product :of
+indResult "0..*" --> "0..1" panResult :affects
+panResult "0..1" --> "1" Panel :of
+@enduml
