@@ -1,91 +1,111 @@
-= AsciiDoc Article Title
-Firstname Lastname <author@asciidoctor.org>
-3.0, July 29, 2022: AsciiDoc article template
+= Problem Domain Explained
 :toc:
-:icons: font
-:url-quickref: https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/
+[.text-center]
 
-Content entered directly below the header but before the first section heading is called the preamble.
+This document intends to introduce the problem domain, that Tasting Experiments (or TasEx for short) tries to address.
 
-== First level heading
+== Introduction
+Imagine you're brewing a beer. There are many factors involved that affect how the final result (beer) tastes and looks like. To simplify the topic let's assume there are only following factors involved, that are gropud into 3 production stages, let's call them beer parameters:
 
-This is a paragraph with a *bold* word and an _italicized_ word.
-
-.Image caption
-image::image-file-name.png[I am the image alt text.]
-
-This is another paragraph.footnote:[I am footnote text and will be displayed at the bottom of the article.]
-
-=== Second level heading
-
-.Unordered list title
-* list item 1
-** nested list item
-*** nested nested list item 1
-*** nested nested list item 2
-* list item 2
-
-This is a paragraph.
-
-.Example block title
-====
-Content in an example block is subject to normal substitutions.
-====
-
-.Sidebar title
-****
-Sidebars contain aside text and are subject to normal substitutions.
-****
-
-==== Third level heading
-
-[#id-for-listing-block]
-.Listing block title
-----
-Content in a listing block is subject to verbatim substitutions.
-Listing block content is commonly used to preserve code input.
-----
-
-===== Fourth level heading
-
-.Table title
+.Simplified beer paramaters
+[cols=8]
 |===
-|Column heading 1 |Column heading 2
+|*Brewing phase*
+4+|Mashing
+|Boiling
+2+|Fermentation
 
-|Column 1, row 1
-|Column 2, row 1
-
-|Column 1, row 2
-|Column 2, row 2
+|*Parameter*
+|Grain bill
+|Water (minerals)
+|Temperature scheme
+|pH
+|Hop additions
+|Yeast strain
+|Temperature scheme
 |===
 
-====== Fifth level heading
+In a well designed experiment there should be only one variable changed at a time, so that any change in the result can be considered a result of changing it. In the search for perfect beer, a researcher has brewed many beers, with various values for the possible parameters:
 
-[quote,firstname lastname,movie title]
-____
-I am a block quote or a prose excerpt.
-I am subject to normal substitutions.
-____
+.Beers brewed for research
+[cols=8]
+|===
+|Beer Id 7+|Parameters
+|
 
-[verse,firstname lastname,poem title and more]
-____
-I am a verse block.
-  Indents and endlines are preserved in verse blocks.
-____
+4+|Mashing
+|Boiling
+2+|Fermentation
 
-== First level heading
+|
+|Grain bill
+|Water (minerals)
+|Temperature scheme
+|pH
+|Hop additions
+|Yeast strain
+|Temperature scheme
 
-TIP: There are five admonition labels: Tip, Note, Important, Caution and Warning.
+|A
+|...
+|...
+|...
+|5.4
+|...
+|WY1056
+|Flat 20°C
 
-// I am a comment and won't be rendered.
+|...|...|...|...|...|...|...|...
 
-. ordered list item
-.. nested ordered list item
-. ordered list item
+|I|...|...|...|5.5|...|Kveik Voss|Flat 20°C
+|J|...|...|...|5.5|...|Kveik Voss|Flat 30°C
+|K|...|...|...|5.5|...|Kveik Lutra|Flat 20°C
+|L|...|...|...|5.5|...|Kveik Lutra|Flat 30°C
 
-The text at the end of this sentence is cross referenced to <<_third_level_heading,the third level heading>>
+|...|...|...|...|...|...|...|...
 
-== First level heading
+|===
 
-This is a link to the https://docs.asciidoctor.org/home/[Asciidoctor documentation].
-This is an attribute reference {url-quickref}[that links this text to the AsciiDoc Syntax Quick Reference].
+Now, let's assume researcher is interested how beer K compares to L. From the table above one can see that the variable tested here is the fermentation temperature. As in previous researches (eg. one published in https://www.mdpi.com/2311-5637/8/8/410[Fermentation Journal]) beer L (higher temperature) fermented much faster thatn beer K (lower temperature). This can be easily observed during experimental brewing.
+
+How does the temperature affect the sensory characteristic of beer though? That's where triangle testing kicks in
+
+TIP: https://brulosophy.com/projects/exbeeriments/[Brürolosophy page] contains description of many similar experiments on beer brewing. They use triangle testing to discover if the factor is important in the process.
+
+== Triangle testing
+A tasting panel (or multiple panels) are held. During each panel, it's participants are served 3 samples. Two of beer K and one of beer L, or the other way around: 1 K and 2 Ls. Their task is to figure the odd sample.
+
+If sufficient number of tasters correctly identify the odd sample then there is a significant influence of fermentation temperature (20° or 30° respectively) on the beer.
+
+However, if sufficient number of tasters fail to identify the odd sample, than there is no significant difference in sensory characteristics of the beer, which suggest, brewer can run his fermentation in 30°C to have it finished within few days without adverse impact on beer quality.
+
+=== Preparation
+Each sample needs to be encoded so that tasters do not know what they have in their glasses, hence the researcher creates a list of random sample IDs that will be assigned to each cup. Than he puts all the IDs into groups of three (a group for each taster) and decides which beer: K or L gets into each, minding that some tasters will get two samples of K and one of L, and some will get two samples of L and one sample of K. A list of sample IDs, their grouping and which beer to put into will be then provided to stewards, that will prepare samples for tasting
+
+=== Tasting
+Each taster is presented with 3 samples, each having a unique (in the panel) ID. Using sensory analysis he will pick one sample that, in his opinion, differs from other two - the odd one. Than the taster will fill out the form providing required data. If he picked the correct odd sample or failed to do so will be one of the data items collected during the test.
+
+=== Data collection
+Researched is interested if the variable that makes 2 beers different (in our case beers K and L differ solely by fermentation temperature). Additional data may be required as well and will be available in the form to be filled by the tasters, such as:
+
+* difference attributes, such as: 'how hard was it to pick the odd sample', 'which beer tastes more sour', 'which beer, and how strongly is preferred by the taster'
+* sample characteristics, such as: 'how hoppy each of the beers was on the scale of 1-5', 'how likely, in a scale 1-10 would the taster recommend the beer to his friends'
+* panel characteristics, such as: 'when was the test run', 'where was the test run'
+* taster characteristics, which can be either derived from panel description (eg. reasearcher knows, all panel members are professional brewers, certified beer judges, random persons, young male audlts etc), or provided by the taster during the panel (or stored in his account in the app)
+
+=== Data analysis
+Test results can be considered at many levels:
+
+* individual - eg. 'did individual taster identify the odd sample correctly'
+* panel level - eg. 'what are the %s of correct and failed identification', 'does taster characteristics affect the ratio of correct identifications', 'given the panel size and number of correct identifications, are the two beers different'?
+* test level - same as panel level, but aggregating data from all panels for the 2 beers
+* experiment data - after many 1 vs 1 tests, some extra characteristics and data analysis such as Multivariate ANOVA can be calculated to understand how all different beer parameters affect the sensory profile of the beer.
+
+== Software purpose
+This software aims at supporting processes related to:
+
+* test preparation
+* tasting
+* data collection
+* presentation of individual and panel results
+* providing data input for test and experiment level analysis (only data)
