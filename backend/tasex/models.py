@@ -18,7 +18,7 @@ class Panel(models.Model):
     experiment = models.ForeignKey(Experiment, on_delete=models.CASCADE, related_name='panels')
     description = models.TextField()
     planned_samples = models.PositiveSmallIntegerField()
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, help_text='if Panel accepts results')
     closed_at = models.DateTimeField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
