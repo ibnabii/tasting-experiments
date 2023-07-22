@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from .forms import ExperimentForm
 from .models import Experiment, Panel, Product
 
 
@@ -8,6 +9,7 @@ class ExperimentAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at', )
     list_display = ('internal_title', 'title', 'created_at', 'prod_a_internal_name', 'prod_b_internal_name')
     ordering = ('-created_at', )
+    form = ExperimentForm
 
     def prod_a_internal_name(self, obj):
         return obj.product_A.internal_name
