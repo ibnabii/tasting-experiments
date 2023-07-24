@@ -32,9 +32,9 @@ class PanelModelTests(TestCase):
 
     def test_create_panel_with_even_panelists(self):
         PANELISTS = 6
-        panel_attibutes = self.DEFAULT_PANEL_ATTRIBUTES.copy()
-        panel_attibutes['planned_panelists'] = PANELISTS
-        pnl = Panel.objects.create(**panel_attibutes)
+        panel_attributes = self.DEFAULT_PANEL_ATTRIBUTES.copy()
+        panel_attributes['planned_panelists'] = PANELISTS
+        pnl = Panel.objects.create(**panel_attributes)
 
         # correct number of SampleSets
         self.assertEquals(
@@ -63,9 +63,9 @@ class PanelModelTests(TestCase):
 
     def test_create_panel_with_odd_panelists(self):
         PANELISTS = 7
-        panel_attibutes = self.DEFAULT_PANEL_ATTRIBUTES.copy()
-        panel_attibutes['planned_panelists'] = PANELISTS
-        pnl = Panel.objects.create(**panel_attibutes)
+        panel_attributes = self.DEFAULT_PANEL_ATTRIBUTES.copy()
+        panel_attributes['planned_panelists'] = PANELISTS
+        pnl = Panel.objects.create(**panel_attributes)
 
         # correct number of SampleSets
         self.assertEquals(

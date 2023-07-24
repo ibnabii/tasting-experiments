@@ -1,6 +1,7 @@
 ## Django
 ### Models
 - [ ] admin for Panel - use internal experiment name
+- [ ] restrict changing planned_panelists attribute in Panel
 ## dev tools
 - [ ] Automate puml -> svg/png rendering (https://github.com/grassedge/generate-plantuml-action/tree/master)
 - [ ] define testing strategy
