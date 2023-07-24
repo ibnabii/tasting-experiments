@@ -9,7 +9,7 @@ class InternalNameChoiceField(forms.ModelChoiceField):
             return obj.internal_name
         if hasattr(obj, 'internal_title'):
             return obj.internal_title
-        return obj.__str__()
+        return obj.__str__
 
 
 class ExperimentForm(forms.ModelForm):

@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from ..models import Experiment, Product, Panel, SampleSet, Sample
@@ -93,3 +94,25 @@ class PanelModelTests(TestCase):
             len(samples_codes),
             len(set(samples_codes))
         )
+
+    def test_editing_fields(self):
+        pnl = Panel.objects.create(**self.DEFAULT_PANEL_ATTRIBUTES)
+
+        # ok to change attributes
+        new_description = 'changed description'
+        new_show_exp_description = 'AFTER_TASTING'
+        new_is_active = False
+        pnl.description = new_description
+        pnl.show_exp_description = new_show_exp_description
+        pnl.is_active = new_is_active
+        pnl.save()
+        pnl2 = Panel.objects.get(pk=pnl.pk)
+        self.assertEquals(new_description, pnl2.description)
+        self.assertEquals(new_show_exp_description, pnl2.show_exp_description)
+        self.assertEquals(new_is_active, pnl2.is_active)
+
+        # fail change of planned_panelists
+        pnl.planned_panelists = pnl.planned_panelists - 1
+        self.assertRaises(ValidationError, pnl.save)
+
+

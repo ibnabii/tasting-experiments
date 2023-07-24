@@ -1,6 +1,7 @@
 from random import sample, getrandbits
 from uuid import uuid4
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
@@ -62,6 +63,13 @@ class Panel(models.Model):
     def __str__(self):
         return self.description[:50]
 
+    def clean(self):
+        if Panel.objects.filter(pk=self.pk).exists():
+            orig = Panel.objects.get(pk=self.pk)
+            if self.planned_panelists != orig.planned_panelists:
+                raise ValidationError('Cannot change "planned_panelists" field')
+
+
     def save(self, *args, **kwargs):
         # Automatically creates samples for the panel upon it's creation
         if self._state.adding:
@@ -83,6 +91,10 @@ class Panel(models.Model):
                         product=product_ids[(i + j) % 2],
                         code=sample_codes[3 * i + j]
                     )
+        else:
+            orig = Panel.objects.get(pk=self.pk)
+            if self.planned_panelists != orig.planned_panelists:
+                raise ValidationError('Cannot change "planned_panelists" field')
 
         super().save(*args, **kwargs)
 
