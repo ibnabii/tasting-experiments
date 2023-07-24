@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .forms import ExperimentForm
+from .forms import ExperimentForm, PanelForm
 from .models import Experiment, Panel, Product, SampleSet, Sample
 
 
@@ -31,6 +31,7 @@ class ExperimentAdmin(admin.ModelAdmin):
 
 @admin.register(Panel)
 class PanelAdmin(admin.ModelAdmin):
+    form = PanelForm
     readonly_fields = (
         'created_at',
         'modified_at',
