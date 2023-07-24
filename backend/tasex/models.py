@@ -1,7 +1,8 @@
+from random import sample, getrandbits
 from uuid import uuid4
 
 from django.db import models
-
+from django.urls import reverse
 
 class Product(models.Model):
     brew_id = models.CharField(max_length=20, help_text='Internal brewing ID, not shown to panelists')
@@ -26,14 +27,26 @@ class Experiment(models.Model):
         return self.title
 
 
+class SampleSet(models.Model):
+    panel = models.ForeignKey('Panel', on_delete=models.CASCADE, related_name='sample_sets')
+    is_used = models.BooleanField(default=False)
+
+
+class Sample(models.Model):
+    sample_set = models.ForeignKey(SampleSet, on_delete=models.CASCADE, related_name='samples')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='samples')
+    code = models.CharField(max_length=5)
+
+
 class Panel(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
     experiment = models.ForeignKey(Experiment, on_delete=models.CASCADE, related_name='panels')
     description = models.TextField()
-    planned_samples = models.PositiveSmallIntegerField()
+    planned_panelists = models.PositiveSmallIntegerField()
+
     class ShowExperimentDescription(models.TextChoices):
         NO = 'NO', 'No'
-        AFTER_TASTING= 'AFTER_TASTING', 'Show after tasting',
+        AFTER_TASTING = 'AFTER_TASTING', 'Show after tasting',
         BEFORE_TASTING = 'BEFORE_TASTING', 'Show before tasting'
     show_exp_description = models.CharField(
         choices=ShowExperimentDescription.choices,
@@ -49,13 +62,29 @@ class Panel(models.Model):
     def __str__(self):
         return self.description[:50]
 
+    def save(self, *args, **kwargs):
+        # Automatically creates samples for the panel upon it's creation
+        if self._state.adding:
+            # generate random ids for all the samples
+            sample_codes = sample(range(1000, 10000), self.planned_panelists * 3)
+            # randomly decide how to assign samples to products
+            product_ids = [
+                self.experiment.product_A,
+                self.experiment.product_B
+            ]
+            if getrandbits(1):
+                product_ids.reverse()
 
-class SampleSet(models.Model):
-    panel = models.ForeignKey(Panel, on_delete=models.CASCADE, related_name='sample_sets')
-    is_used = models.BooleanField(default=False)
+            for i in range(self.planned_panelists):
+                sample_set = SampleSet.objects.create(panel=self)
+                for j in range(3):
+                    Sample.objects.create(
+                        sample_set=sample_set,
+                        product=product_ids[(i + j) % 2],
+                        code=sample_codes[3 * i + j]
+                    )
 
+        super().save(*args, **kwargs)
 
-class Sample(models.Model):
-    sample_set = models.ForeignKey(SampleSet, on_delete=models.CASCADE, related_name='samples')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='samples')
-    code = models.CharField(max_length=5)
+    def get_absolute_url(self):
+        return reverse('tasex:panel', kwargs={"pk": self.id})

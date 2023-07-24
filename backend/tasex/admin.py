@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from .forms import ExperimentForm
-from .models import Experiment, Panel, Product
+from .models import Experiment, Panel, Product, SampleSet, Sample
 
 
 @admin.register(Experiment)
@@ -35,6 +36,8 @@ class PanelAdmin(admin.ModelAdmin):
         'modified_at',
     )
     list_display = (
+        '__str__',
+        'temp_gui',
         'experiment',
         'is_active',
         'created_at',
@@ -52,6 +55,9 @@ class PanelAdmin(admin.ModelAdmin):
         'created_at',
     )
 
+    def temp_gui(self, obj):
+        return mark_safe('<a href="%s">Temp GUI</a>' % obj.get_absolute_url())
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -60,4 +66,18 @@ class ProductAdmin(admin.ModelAdmin):
         'internal_name',
         'name',
         'description',
+    )
+
+
+@admin.register(SampleSet)
+class SampleSetAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Sample)
+class SampleAdmin(admin.ModelAdmin):
+    list_display = (
+        'sample_set',
+        'code',
+        'product'
     )

@@ -1,3 +1,6 @@
+## Django
+### Models
+- [ ] admin for Panel - use internal experiment name
 ## dev tools
 - [ ] Automate puml -> svg/png rendering (https://github.com/grassedge/generate-plantuml-action/tree/master)
 - [ ] define testing strategy
