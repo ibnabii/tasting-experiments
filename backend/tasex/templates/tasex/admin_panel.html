@@ -4,3 +4,5 @@
 {{  object.experiment.description }}
 <h1>Panel</h1>
 <h4>{{ object.description }}</h4>
+
+<a href="{% url 'tasex:panel-qr' object.id %}">Get QR code</a>
