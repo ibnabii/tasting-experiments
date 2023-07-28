@@ -25,3 +25,4 @@ class PanelViewSet(viewsets.ModelViewSet):
 class AdminPanelView(LoginRequiredMixin, DetailView):
     template_name = 'tasex/admin_panel.html'
     model = Panel
+    queryset = Panel.objects.filter(is_active=True)

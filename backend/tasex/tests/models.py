@@ -98,16 +98,18 @@ class PanelModelTests(TestCase):
     def test_editing_fields(self):
         pnl = Panel.objects.create(**self.DEFAULT_PANEL_ATTRIBUTES)
 
-        # TODO: refactor to make it clear where save fails
         # ok to change attributes
         new_description = 'changed description'
         new_show_exp_description = 'AFTER_TASTING'
         new_is_active = False
+
         pnl.description = new_description
         pnl.show_exp_description = new_show_exp_description
         pnl.is_active = new_is_active
+
         pnl.save()
         pnl2 = Panel.objects.get(pk=pnl.pk)
+
         self.assertEquals(new_description, pnl2.description)
         self.assertEquals(new_show_exp_description, pnl2.show_exp_description)
         self.assertEquals(new_is_active, pnl2.is_active)
