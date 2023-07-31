@@ -6,26 +6,13 @@ from ..models import Experiment, Product, Panel, SampleSet, Sample
 
 
 class PanelViewTest(TestCase):
+    fixtures = ['auto_test_data']
+
     def setUp(self):
-        self.p1 = Product.objects.create(
-            brew_id='prod_brew_id_1',
-            internal_name='prod_internal_name_1',
-            name='prod_name_1',
-            description='prod_description_1'
-        )
-        self.p2 = Product.objects.create(
-            brew_id='prod_brew_id_2',
-            internal_name='prod_internal_name_2',
-            name='prod_name_2',
-            description='prod_description_2'
-        )
-        self.exp = Experiment.objects.create(
-            internal_title='exp_internal_title',
-            title='exp_title',
-            description='exp_description',
-            product_A=self.p1,
-            product_B=self.p2
-        )
+        self.exp = Experiment.objects.get(id='aaa66601-3b2e-4695-bc78-d1becc8428c7')
+        self.p1 = Product.objects.get(id=6660001)
+        self.p2 = Product.objects.get(id=6660002)
+
         self.pnl_1 = Panel.objects.create(
             experiment=self.exp,
             description='pnl_1_description',

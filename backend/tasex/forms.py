@@ -6,6 +6,8 @@ from .models import Product, Experiment, Panel
 class InternalNameChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         if hasattr(obj, 'internal_name'):
+            if hasattr(obj, 'brew_id'):
+                return f'{obj.internal_name} ({obj.brew_id})'
             return obj.internal_name
         if hasattr(obj, 'internal_title'):
             return obj.internal_title

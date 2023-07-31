@@ -1,0 +1,34 @@
+[
+{
+  "model": "tasex.product",
+  "pk": 6660001,
+  "fields": {
+    "brew_id": "brew_id_1",
+    "internal_name": "Product 1 internal name",
+    "name": "Product 1",
+    "description": "some descriptiopn oif product 1"
+  }
+},
+{
+  "model": "tasex.product",
+  "pk": 6660002,
+  "fields": {
+    "brew_id": "brew_id_2",
+    "internal_name": "Product 2 internal name",
+    "name": "Product 2",
+    "description": "bla bla bla das ist ein Produkt numer Zwei"
+  }
+},
+{
+  "model": "tasex.experiment",
+  "pk": "aaa66601-3b2e-4695-bc78-d1becc8428c7",
+  "fields": {
+    "internal_title": "exp_1",
+    "title": "Experiment 1",
+    "description": "Some description of experiment 1",
+    "created_at": "2023-07-24T21:27:09.172",
+    "product_A": 6660001,
+    "product_B": 6660002
+  }
+}
+]
