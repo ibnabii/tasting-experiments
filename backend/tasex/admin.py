@@ -40,18 +40,17 @@ class PanelAdmin(admin.ModelAdmin):
         '__str__',
         'temp_gui',
         'experiment',
-        'is_active',
+        'status',
         'created_at',
         'description',
     )
     list_filter = (
         'experiment',
-        'is_active',
+        'status',
         'created_at'
     )
     ordering = (
         'experiment',
-        '-is_active',
         'closed_at',
         'created_at',
     )
@@ -82,3 +81,11 @@ class SampleAdmin(admin.ModelAdmin):
         'code',
         'product'
     )
+
+from django.contrib.sessions.models import Session
+class SessionAdmin(admin.ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+    list_display = ['session_key', '_session_data', 'expire_date']
+    ordering = ['-expire_date']
+admin.site.register(Session, SessionAdmin)
