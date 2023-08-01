@@ -2,7 +2,7 @@ import qrcode
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest
-from django.db.models import Q
+# from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import reverse
 from django.views.generic import DetailView
@@ -30,7 +30,18 @@ class PanelViewSet(viewsets.ModelViewSet):
 class AdminPanelView(LoginRequiredMixin, DetailView):
     template_name = 'tasex/admin_panel.html'
     model = Panel
-    raise_exception = True
+    # 404 instead of redirect to login page for not logged-in user
+    # raise_exception = True
+
+
+class PanelStep1(DetailView):
+    model = Panel
+    template_name = 'tasex/panel_step_1.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        panel_id = str(self.get_object().id)
+        request.session.get('panels').update({panel_id: 2})
+        return super().dispatch(request, *args, **kwargs)
 
 
 class AnonymousPanelView(DetailView):
@@ -50,6 +61,7 @@ class AnonymousPanelView(DetailView):
                 self.template_name = 'tasex/panel_planned.html'
             case Panel.PanelStatus.PRESENTING_RESULTS:
                 self.template_name = 'tasex/panel_results.html'
+
             case Panel.PanelStatus.ACCEPTING_ANSWERS:
                 # if panel is accepting_answers, the status of the user will be saved
                 panel_id = str(self.get_object().id)
@@ -63,8 +75,12 @@ class AnonymousPanelView(DetailView):
                     request.session.get('panels').update({panel_id: 1})
                     request.session.save()
 
-                print('Anonymous user with session:', request.session.session_key)
-
+                # check user status
+                match request.session.get('panels', {}).get(panel_id):
+                    case 1:
+                        return PanelStep1.as_view()(request, *args, **kwargs)
+                    case _:
+                        self.template_name = 'tasex/panel_wait_for_finish.html'
             case _:
                 # for debug
                 raise BadRequest(f'I do not know what to do with panel status {self.get_object().status}')
@@ -72,14 +88,13 @@ class AnonymousPanelView(DetailView):
 
 
 class PanelView(DetailView):
-    model = Panel
-    template_name = 'tasex/admin_panel.html'
 
     def dispatch(self, request, *args, **kwargs):
         # serve another view if dealing with anonymous user
         if request.user.is_anonymous:
             return AnonymousPanelView.as_view()(request, *args, **kwargs)
-        return super().dispatch(request, *args, **kwargs)
+        else:
+            return AdminPanelView.as_view()(request, *args, **kwargs)
 
 
 def render_qr_code(request, pk):
