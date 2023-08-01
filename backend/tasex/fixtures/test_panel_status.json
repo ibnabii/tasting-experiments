@@ -1,0 +1,58 @@
+[
+{
+  "model": "tasex.panel",
+  "pk": null,
+  "fields": {
+    "experiment": "aaa66601-3b2e-4695-bc78-d1becc8428c7",
+    "description": "Panel_accepting",
+    "planned_panelists": 3,
+    "show_exp_description": "NO",
+    "status": "ACCEPTING_ANSWERS",
+    "closed_at": null,
+    "created_at": "2023-08-01T18:43:18.696",
+    "modified_at": "2023-08-01T18:43:18.696"
+  }
+},
+{
+  "model": "tasex.panel",
+  "pk": null,
+  "fields": {
+    "experiment": "aaa66601-3b2e-4695-bc78-d1becc8428c7",
+    "description": "Panel_hidden",
+    "planned_panelists": 3,
+    "show_exp_description": "NO",
+    "status": "HIDDEN",
+    "closed_at": null,
+    "created_at": "2023-08-01T18:43:48.567",
+    "modified_at": "2023-08-01T18:43:48.567"
+  }
+},
+{
+  "model": "tasex.panel",
+  "pk": null,
+  "fields": {
+    "experiment": "aaa66601-3b2e-4695-bc78-d1becc8428c7",
+    "description": "Panel_results",
+    "planned_panelists": 3,
+    "show_exp_description": "NO",
+    "status": "PRESENTING_RESULTS",
+    "closed_at": null,
+    "created_at": "2023-08-01T18:43:35.916",
+    "modified_at": "2023-08-01T18:43:35.916"
+  }
+},
+{
+  "model": "tasex.panel",
+  "pk": null,
+  "fields": {
+    "experiment": "aaa66601-3b2e-4695-bc78-d1becc8428c7",
+    "description": "Panel_planned",
+    "planned_panelists": 3,
+    "show_exp_description": "NO",
+    "status": "PLANNED",
+    "closed_at": null,
+    "created_at": "2023-08-01T18:43:04.200",
+    "modified_at": "2023-08-01T18:43:04.200"
+  }
+}
+]

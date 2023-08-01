@@ -6,29 +6,54 @@ from ..models import Experiment, Product, Panel, SampleSet, Sample
 
 
 class PanelViewTest(TestCase):
-    fixtures = ['auto_test_data']
+    fixtures = ['test_base', 'test_panel_status']
 
     def setUp(self):
-        self.exp = Experiment.objects.get(id='aaa66601-3b2e-4695-bc78-d1becc8428c7')
-        self.p1 = Product.objects.get(id=6660001)
-        self.p2 = Product.objects.get(id=6660002)
+        self.panel_accepting = Panel.objects.get(description='Panel_accepting').get_absolute_url()
+        self.panel_hidden = Panel.objects.get(description='Panel_hidden').get_absolute_url()
+        self.panel_planned = Panel.objects.get(description='Panel_planned').get_absolute_url()
+        self.panel_results = Panel.objects.get(description='Panel_results').get_absolute_url()
 
-        self.pnl_1 = Panel.objects.create(
-            experiment=self.exp,
-            description='pnl_1_description',
-            planned_panelists=5
-        )
         self.user_super_pswd = '&!ep$o2Xf#e55#4&n!^$YZUsRLNmF9L36pS9%C*4L7MGdp#w%^b4@W%xY5#9&i'
         self.user_super = User.objects.create_superuser('super_user', 'mail@mail.com', self.user_super_pswd)
-        self.panel1_url = self.pnl_1.get_absolute_url()
 
     def test_anonymous_user_cannot_access(self):
         c = Client()
-        response = c.get(self.panel1_url)
-        self.assertEquals(response.status_code, 403)
+        response = c.get(self.panel_hidden)
+        self.assertEquals(response.status_code, 404)
+
+    def test_anonymous_user_can_access(self):
+        c = Client()
+        response = c.get(self.panel_planned)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'tasex/panel_planned.html')
+
+        response = c.get(self.panel_results)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'tasex/panel_results.html')
+
+        response = c.get(self.panel_accepting)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'tasex/panel_step_1.html')
+        response = c.get(self.panel_accepting)
+        self.assertTemplateUsed(response, 'tasex/panel_wait_for_finish.html')
 
     def test_superuser_can_access(self):
         c = Client()
         c.force_login(self.user_super)
-        response = c.get(self.panel1_url)
+
+        response = c.get(self.panel_hidden)
         self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'tasex/admin_panel.html')
+
+        response = c.get(self.panel_accepting)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'tasex/admin_panel.html')
+
+        response = c.get(self.panel_planned)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'tasex/admin_panel.html')
+
+        response = c.get(self.panel_results)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'tasex/admin_panel.html')

@@ -5,7 +5,7 @@ from ..models import Experiment, Product, Panel, SampleSet, Sample
 
 
 class PanelModelTests(TestCase):
-    fixtures = ['auto_test_data']
+    fixtures = ['test_base']
 
     def setUp(self):
         self.exp = Experiment.objects.get(id='aaa66601-3b2e-4695-bc78-d1becc8428c7')
@@ -91,14 +91,14 @@ class PanelModelTests(TestCase):
 
         pnl.description = new_description
         pnl.show_exp_description = new_show_exp_description
-        pnl.is_active = new_is_active
+        pnl.status = Panel.PanelStatus.HIDDEN
 
         pnl.save()
         pnl2 = Panel.objects.get(pk=pnl.pk)
 
         self.assertEquals(new_description, pnl2.description)
         self.assertEquals(new_show_exp_description, pnl2.show_exp_description)
-        self.assertEquals(new_is_active, pnl2.is_active)
+        self.assertEquals(pnl.status, pnl2.status)
 
         # fail change of planned_panelists
         pnl.planned_panelists = pnl.planned_panelists - 1
