@@ -47,7 +47,7 @@ class Panel(models.Model):
 
     class ShowExperimentDescription(models.TextChoices):
         NO = 'NO', 'No'
-        AFTER_TASTING = 'AFTER_TASTING', 'Show after tasting',
+        AFTER_TASTING = 'AFTER_TASTING', 'Show after tasting'
         BEFORE_TASTING = 'BEFORE_TASTING', 'Show before tasting'
     show_exp_description = models.CharField(
         choices=ShowExperimentDescription.choices,
@@ -55,7 +55,17 @@ class Panel(models.Model):
         max_length=20,
         verbose_name="Show experiment description to panelists?"
     )
-    is_active = models.BooleanField(default=True, help_text='if Panel accepts results')
+
+    class PanelStatus(models.TextChoices):
+        PLANNED = 'PLANNED', 'Planned, but not accepting answers yet'
+        ACCEPTING_ANSWERS = 'ACCEPTING_ANSWERS', 'Accepting answers'
+        PRESENTING_RESULTS = 'PRESENTING_RESULTS', 'Presenting results'
+        HIDDEN = 'HIDDEN', 'Hidden from anonymous users'
+    status = models.CharField(
+        choices=PanelStatus.choices,
+        default=PanelStatus.PLANNED,
+        max_length=20
+    )
     closed_at = models.DateTimeField(null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
