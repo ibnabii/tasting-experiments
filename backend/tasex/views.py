@@ -140,7 +140,12 @@ class PanelView(DetailView):
 
 
 def render_qr_code(request, pk):
-
+    if (
+        request.user.is_anonymous
+        and
+        Panel.objects.filter(id=pk).values_list('status')[0][0] == Panel.PanelStatus.HIDDEN
+    ):
+        raise PermissionDenied
     qr = qrcode.QRCode(
         version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_Q,

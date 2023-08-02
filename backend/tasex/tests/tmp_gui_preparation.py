@@ -20,13 +20,20 @@ class PanelViewTest(TestCase):
 
     def test_anonymous_user_cannot_access(self):
         c = Client()
+        # panel in hidden status
         response = c.get(self.panel_hidden.get_absolute_url())
         self.assertEquals(response.status_code, 403)
+        response = c.get(reverse('tasex:panel-qr', kwargs={'pk': self.panel_hidden.id}))
+        self.assertEquals(response.status_code, 403)
+        response = c.get(reverse('tasex:panel-sets', kwargs={'pk': self.panel_hidden.id}))
+        self.assertEquals(response.status_code, 403)
+        response = c.get(reverse('tasex:panel-prepare', kwargs={'pk': self.panel_hidden.id}))
+        self.assertEquals(response.status_code, 403)
 
+        # admin views for panel in accepting status
         # view with sets
         response = c.get(reverse('tasex:panel-sets', kwargs={'pk': self.panel_accepting.id}))
         self.assertEquals(response.status_code, 403)
-
         # view for preparation (samples by product)
         response = c.get(reverse('tasex:panel-prepare', kwargs={'pk': self.panel_accepting.id}))
         self.assertEquals(response.status_code, 403)
@@ -46,6 +53,8 @@ class PanelViewTest(TestCase):
         self.assertTemplateUsed(response, 'tasex/panel_step_1.html')
         response = c.get(self.panel_accepting.get_absolute_url())
         self.assertTemplateUsed(response, 'tasex/panel_wait_for_finish.html')
+        response = c.get(reverse('tasex:panel-qr', kwargs={'pk': self.panel_accepting.id}))
+        self.assertEquals(response.status_code, 200)
 
     def test_superuser_can_access(self):
         c = Client()
