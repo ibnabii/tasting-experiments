@@ -71,12 +71,13 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(SampleSet)
 class SampleSetAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('__str__', 'panel')
 
 
 @admin.register(Sample)
 class SampleAdmin(admin.ModelAdmin):
     list_display = (
+        '__str__',
         'sample_set',
         'code',
         'product'

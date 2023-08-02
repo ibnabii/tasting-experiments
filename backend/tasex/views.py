@@ -1,16 +1,16 @@
 import qrcode
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import BadRequest
+from django.core.exceptions import BadRequest, PermissionDenied
 # from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import reverse
-from django.views.generic import DetailView
+from django.views.generic import DetailView, FormView, ListView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 
 from .serializers import ExperimentSerializer, PanelSerializer
-from .models import Experiment, Panel
+from .models import Experiment, Panel, Sample, SampleSet, Product
 
 
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -27,12 +27,54 @@ class PanelViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
+class SamplePreparationView(LoginRequiredMixin, ListView):
+    raise_exception = True
+    template_name = 'tasex/owner_panel_products.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        # Sample.objects.filter(sample_set__panel_id=self.kwargs['pk']).select_related('product')
+        products = (Panel.objects
+                    .filter(id=self.kwargs['pk'])
+                    .values_list('experiment__product_A', 'experiment__product_B'))
+        return Product.objects.filter(pk__in=list(*products))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['samplesA'] = (
+            Sample.objects
+            .filter(product_id=context['products'][0])
+            .filter(sample_set__panel_id=self.kwargs['pk']))
+        context['samplesB'] = (
+            Sample.objects
+            .filter(product_id=context['products'][1])
+            .filter(sample_set__panel_id=self.kwargs['pk']))
+
+        return context
+
+
+
+class SampleSetsView(LoginRequiredMixin, ListView):
+    raise_exception = True
+    template_name = 'tasex/owner_panel_sets.html'
+    context_object_name = 'sample_sets'
+
+    def get_queryset(self):
+        return SampleSet.objects.filter(panel_id=self.kwargs['pk']).prefetch_related('samples')
+
 class AdminPanelView(LoginRequiredMixin, DetailView):
     template_name = 'tasex/admin_panel.html'
     model = Panel
     # 404 instead of redirect to login page for not logged-in user
     # raise_exception = True
 
+
+# class PanelStep1(FormView):
+#     def get_form_kwargs(self):
+#         form_kwargs = super().get_form_kwargs()
+#         if 'pk' in self.kwargs:
+#             form_kwargs['samples'] = Sample.objects.get(pk=int(self.kwargs['pk']))
+#         return form_kwargs
 
 class PanelStep1(DetailView):
     model = Panel
@@ -56,7 +98,7 @@ class AnonymousPanelView(DetailView):
         match self.get_object().status:
             # this condition is the equivalent of defining queryset to skip HIDDEN
             case Panel.PanelStatus.HIDDEN:
-                raise Http404
+                raise PermissionDenied
             case Panel.PanelStatus.PLANNED:
                 self.template_name = 'tasex/panel_planned.html'
             case Panel.PanelStatus.PRESENTING_RESULTS:

@@ -5,4 +5,6 @@
 <h1>Panel</h1>
 <h4>{{ object.description }}</h4>
 
-<a href="{% url 'tasex:panel-qr' object.id %}">Get QR code</a>
+<a href="{% url 'tasex:panel-qr' object.id %}">Get QR code</a><br/>
+<a href="{% url 'tasex:panel-sets' object.id %}">Samples by sets</a><br/>
+<a href="{% url 'tasex:panel-prepare' object.id %}">Samples by products</a><br/>

@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
+
 class Product(models.Model):
     brew_id = models.CharField(max_length=20, help_text='Internal brewing ID, not shown to panelists')
     internal_name = models.CharField(max_length=100, help_text='Internal name, not shown to panelists')
@@ -35,7 +36,7 @@ class SampleSet(models.Model):
 
 class Sample(models.Model):
     sample_set = models.ForeignKey(SampleSet, on_delete=models.CASCADE, related_name='samples')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='samples')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='samplesp')
     code = models.CharField(max_length=5)
 
 

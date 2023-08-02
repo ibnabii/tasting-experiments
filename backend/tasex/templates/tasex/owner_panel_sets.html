@@ -1,0 +1,22 @@
+<html><head>
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'tasex/owner.css' %}">
+
+</head><body>
+<table class="simple">
+<thead>
+    <tr><th>Lp</th><th>Próbka 1</th><th>Próbka 2</th><th>Próbka 3</th></tr>
+</thead>
+<tbody>
+{% for sample_set in sample_sets %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        {%  for sample in sample_set.samples.all|dictsort:'code' %}
+            <td>{{ sample.code }}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+</body></html>

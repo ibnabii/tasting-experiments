@@ -1,0 +1,34 @@
+<html><head>
+{% load static %}
+<link rel="stylesheet" href="{% static 'tasex/owner.css' %}">
+
+</head><body>
+
+<table class="simple">
+<thead>
+    <tr><th>Lp</th><th>{{ products.0.brew_id }}</th></tr>
+</thead>
+<tbody>
+{% for sample in samplesA|dictsort:'code' %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ sample.code }}</td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+<div class="pagebreak"> </div>
+<table class="simple">
+<thead>
+    <tr><th>Lp</th><th>{{ products.1.brew_id }}</th></tr>
+</thead>
+<tbody>
+{% for sample in samplesB|dictsort:'code' %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ sample.code }}</td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+</body></html>

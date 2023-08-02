@@ -1,0 +1,28 @@
+table.simple {
+    font-family: sans-serif;
+    border-collapse: collapse;
+}
+
+table.simple td {
+    padding:5px;
+}
+table.simple th {
+    padding-right: 30px;
+}
+
+table.simple thead tr {
+    border-bottom: 2px solid black;
+}
+
+
+table.simple tbody tr {
+    background-color: #D3D3D3FF;
+}
+
+table.simple tbody tr:nth-child(odd) {
+	background-color: #FFFFFF;
+}
+
+@media print {
+    .pagebreak { page-break-before: always; } /* page-break-after works, as well */
+}
