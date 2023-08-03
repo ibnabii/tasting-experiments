@@ -85,8 +85,8 @@ class SelectOddSampleForm(GenericPanelForm):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        samples = Sample.objects.filter(sample_set_id=self.panel_state.sample_set).values_list('code', flat=True)
-        self.fields['odd_sample'].choices = [(code, code) for code in samples]
+        samples = Sample.objects.filter(sample_set_id=self.panel_state.sample_set).values_list('id', 'code')
+        self.fields['odd_sample'].choices = samples
 
 
 FORM_CLASSES = {

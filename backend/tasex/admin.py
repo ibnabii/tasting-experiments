@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from .forms import ExperimentForm, PanelForm
-from .models import Experiment, Panel, Product, SampleSet, Sample
+from .models import Experiment, Panel, Product, SampleSet, Sample, Result
 
 
 @admin.register(Experiment)
@@ -71,7 +71,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(SampleSet)
 class SampleSetAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'panel')
+    list_display = ('__str__', 'panel', 'is_used')
 
 
 @admin.register(Sample)
@@ -82,6 +82,17 @@ class SampleAdmin(admin.ModelAdmin):
         'code',
         'product'
     )
+
+
+@admin.register(Result)
+class ResultAdmin(admin.ModelAdmin):
+    list_display = (
+        '__str__',
+        'sample_set',
+        'odd_sample',
+        'is_correct'
+    )
+
 
 from django.contrib.sessions.models import Session
 class SessionAdmin(admin.ModelAdmin):

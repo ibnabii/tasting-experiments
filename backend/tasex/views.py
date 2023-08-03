@@ -10,7 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 
 from .forms import FORM_CLASSES
-from .models import Experiment, Panel, Sample, SampleSet, Product
+from .models import Experiment, Panel, Sample, SampleSet, Product, Result
 from .serializers import ExperimentSerializer, PanelSerializer
 
 
@@ -71,10 +71,11 @@ class AdminPanelView(LoginRequiredMixin, DetailView):
 
 
 class PanelState:
-    def __init__(self, panel_id, step=1, sample_set=None):
+    def __init__(self, panel_id, step=1, sample_set=None, result=None):
         self.panel_id = panel_id
         self.step = step
         self.sample_set = sample_set
+        self.result = result
 
 
 class PanelStep1(FormView):
@@ -95,11 +96,19 @@ class PanelStep1(FormView):
                 self.panel_state.sample_set = sample_set_id
 
             are_samples_correct = form.cleaned_data.get('are_samples_correct')
-            print('are_samples_correct', are_samples_correct)
             if are_samples_correct == 'False':
                 # reset panel
                 self.panel_state = PanelState(self.panel_id)
+            if are_samples_correct == 'True':
+                sample_set = SampleSet.objects.filter(id=self.panel_state.sample_set).update(is_used=True)
 
+            odd_sample = form.cleaned_data.get('odd_sample')
+            if odd_sample:
+                self.panel_state.result = Result.objects.create(
+                    sample_set=SampleSet.objects.get(id=self.panel_state.sample_set),
+                    odd_sample=Sample.objects.get(id=odd_sample)
+                )
+                self.panel_state.result = self.panel_state.result.id
             self.request.session.get('panels')[self.panel_id] = self.panel_state.__dict__
             self.request.session.save()
 

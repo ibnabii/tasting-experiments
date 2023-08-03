@@ -36,7 +36,7 @@ class SampleSet(models.Model):
 
 class Sample(models.Model):
     sample_set = models.ForeignKey(SampleSet, on_delete=models.CASCADE, related_name='samples')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='samplesp')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='samples')
     code = models.CharField(max_length=5)
 
 
@@ -50,6 +50,7 @@ class Panel(models.Model):
         NO = 'NO', 'No'
         AFTER_TASTING = 'AFTER_TASTING', 'Show after tasting'
         BEFORE_TASTING = 'BEFORE_TASTING', 'Show before tasting'
+
     show_exp_description = models.CharField(
         choices=ShowExperimentDescription.choices,
         default=ShowExperimentDescription.NO,
@@ -62,6 +63,7 @@ class Panel(models.Model):
         ACCEPTING_ANSWERS = 'ACCEPTING_ANSWERS', 'Accepting answers'
         PRESENTING_RESULTS = 'PRESENTING_RESULTS', 'Presenting results'
         HIDDEN = 'HIDDEN', 'Hidden from anonymous users'
+
     status = models.CharField(
         choices=PanelStatus.choices,
         default=PanelStatus.PLANNED,
@@ -110,3 +112,40 @@ class Panel(models.Model):
 
     def get_absolute_url(self):
         return reverse('tasex:panel', kwargs={"pk": self.id})
+
+
+class Result(models.Model):
+    # panel = models.ForeignKey(Panel, on_delete=models.CASCADE, related_name='results')
+    sample_set = models.ForeignKey(SampleSet, on_delete=models.CASCADE, related_name='results')
+    odd_sample = models.ForeignKey(Sample, on_delete=models.CASCADE, related_name='results')
+    is_correct = models.BooleanField(editable=False)
+
+    def validate(self):
+        if (Result.objects
+                .filter(sample_set=self.sample_set)
+                .exclude(id=self.id)
+                .exists()):
+            raise ValidationError('A Result for this SampleSet already exists')
+        # odd sample must belong to sample set
+        if self.odd_sample.sample_set != self.sample_set:
+            raise ValidationError('odd sample does not belong to this Sample Set')
+
+    def clean(self):
+        self.validate()
+
+    def save(self, *args, **kwargs):
+        self.validate()
+        odd_product = (Sample.objects
+            .filter(sample_set=self.sample_set)
+            .values('product_id')
+            .annotate(cnt=models.Count('product_id'))
+            .filter(cnt=1)
+            .values_list('product_id', flat=True)[0]
+        )
+        odd_sample = (Sample.objects
+            .filter(sample_set=self.sample_set)
+            .filter(product_id=odd_product)
+            .values_list('id', flat=True)[0]
+        )
+        self.is_correct = odd_sample == self.odd_sample.id
+        super().save(*args, **kwargs)
