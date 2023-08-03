@@ -3,14 +3,15 @@ import qrcode
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest, PermissionDenied
 # from django.db.models import Q
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import reverse
 from django.views.generic import DetailView, FormView, ListView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 
-from .serializers import ExperimentSerializer, PanelSerializer
+from .forms import SingleSampleForm
 from .models import Experiment, Panel, Sample, SampleSet, Product
+from .serializers import ExperimentSerializer, PanelSerializer
 
 
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -53,7 +54,6 @@ class SamplePreparationView(LoginRequiredMixin, ListView):
         return context
 
 
-
 class SampleSetsView(LoginRequiredMixin, ListView):
     raise_exception = True
     template_name = 'tasex/owner_panel_sets.html'
@@ -62,6 +62,7 @@ class SampleSetsView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return SampleSet.objects.filter(panel_id=self.kwargs['pk']).prefetch_related('samples')
 
+
 class AdminPanelView(LoginRequiredMixin, DetailView):
     template_name = 'tasex/admin_panel.html'
     model = Panel
@@ -69,21 +70,39 @@ class AdminPanelView(LoginRequiredMixin, DetailView):
     # raise_exception = True
 
 
-# class PanelStep1(FormView):
-#     def get_form_kwargs(self):
-#         form_kwargs = super().get_form_kwargs()
-#         if 'pk' in self.kwargs:
-#             form_kwargs['samples'] = Sample.objects.get(pk=int(self.kwargs['pk']))
-#         return form_kwargs
-
-class PanelStep1(DetailView):
-    model = Panel
+class PanelStep1(FormView):
+    # form_class = SingleSampleForm
     template_name = 'tasex/panel_step_1.html'
 
-    def dispatch(self, request, *args, **kwargs):
-        panel_id = str(self.get_object().id)
-        request.session.get('panels').update({panel_id: 2})
-        return super().dispatch(request, *args, **kwargs)
+    def __init__(self):
+        super().__init__()
+        self.panel_id = None
+        self.step = None
+
+    def form_valid(self, form):
+        if form.is_valid():
+            self.request.session.get('panels').update({self.panel_id: self.step + 1})
+            self.request.session.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('tasex:panel', kwargs={'pk': self.kwargs.get('pk')})
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs['panel_id'] = self.kwargs.get('pk')
+        return form_kwargs
+
+    def get_form_class(self):
+        FORM_CLASSES = {
+            1: SingleSampleForm,
+        }
+        return FORM_CLASSES.get(self.step)
+
+    def setup(self, request, *args, **kwargs):
+        self.panel_id = kwargs.get('pk')
+        self.step = request.session.get('panels').get(self.panel_id)
+        return super().setup(request, *args, **kwargs)
 
 
 class AnonymousPanelView(DetailView):
@@ -118,11 +137,11 @@ class AnonymousPanelView(DetailView):
                     request.session.save()
 
                 # check user status
-                match request.session.get('panels', {}).get(panel_id):
-                    case 1:
-                        return PanelStep1.as_view()(request, *args, **kwargs)
-                    case _:
-                        self.template_name = 'tasex/panel_wait_for_finish.html'
+                step = request.session.get('panels', {}).get(panel_id)
+                if step <= 2:
+                    return PanelStep1.as_view()(request, *args, **kwargs)
+                else:
+                    self.template_name = 'tasex/panel_wait_for_finish.html'
             case _:
                 # for debug
                 raise BadRequest(f'I do not know what to do with panel status {self.get_object().status}')

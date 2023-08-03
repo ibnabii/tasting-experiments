@@ -80,7 +80,6 @@ class Panel(models.Model):
             if self.planned_panelists != orig.planned_panelists:
                 raise ValidationError('Cannot change "planned_panelists" field')
 
-
     def save(self, *args, **kwargs):
         # Automatically creates samples for the panel upon it's creation
         if self._state.adding:
