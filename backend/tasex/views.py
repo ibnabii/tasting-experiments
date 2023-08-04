@@ -109,14 +109,11 @@ class PanelStep1(FormView):
                     odd_sample=Sample.objects.get(id=odd_sample)
                 )
                 self.panel_state.result = self.panel_state.result.id
+
             self.request.session.get('panels')[self.panel_id] = self.panel_state.__dict__
             self.request.session.save()
 
         return HttpResponseRedirect(self.get_success_url())
-
-    def form_invalid(self, form):
-        print('form_invalid')
-        return super().form_invalid(form)
 
     def get_success_url(self):
         return reverse('tasex:panel', kwargs={'pk': self.kwargs.get('pk')})

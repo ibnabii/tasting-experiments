@@ -4,6 +4,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from ..models import Experiment, Product, Panel, SampleSet, Sample
+from ..forms import FORM_CLASSES
 
 
 class PanelViewTest(TestCase):
@@ -48,9 +49,14 @@ class PanelViewTest(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'tasex/panel_results.html')
 
-        response = c.get(self.panel_accepting.get_absolute_url())
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'tasex/panel_step_1.html')
+        for i in range(len(FORM_CLASSES)):
+            response = c.get(self.panel_accepting.get_absolute_url())
+            self.assertEquals(response.status_code, 200)
+            self.assertTemplateUsed(response, 'tasex/panel_step_1.html')
+            s = c.session
+            s.get('panels').get(str(self.panel_accepting.id))['step'] += 1
+            s.save()
+
         response = c.get(self.panel_accepting.get_absolute_url())
         self.assertTemplateUsed(response, 'tasex/panel_wait_for_finish.html')
         response = c.get(reverse('tasex:panel-qr', kwargs={'pk': self.panel_accepting.id}))

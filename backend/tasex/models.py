@@ -39,6 +39,8 @@ class Sample(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='samples')
     code = models.CharField(max_length=5)
 
+    class Meta:
+        ordering = ('code',)
 
 class Panel(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)

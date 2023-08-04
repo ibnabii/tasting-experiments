@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from ..models import Experiment, Product, Panel, SampleSet, Sample
+from ..models import Experiment, Product, Panel, SampleSet, Sample, Result
 
 
 class PanelModelTests(TestCase):
@@ -15,6 +15,7 @@ class PanelModelTests(TestCase):
             'experiment': self.exp,
             'description': 'pnl_description',
             'planned_panelists': 1,
+            'status': Panel.PanelStatus.ACCEPTING_ANSWERS
         }
 
     def test_create_panel_with_even_panelists(self):
@@ -104,4 +105,61 @@ class PanelModelTests(TestCase):
         pnl.planned_panelists = pnl.planned_panelists - 1
         self.assertRaises(ValidationError, pnl.save)
 
+
+class ResultModelTest(TestCase):
+    fixtures = ['test_base', 'test_panel_with_samples']
+
+    def setUp(self):
+        self.panel = Panel.objects.get(id='88806093-43b4-4ab9-8040-eb1e5f492ccb')
+        self.sample_set = SampleSet.objects.get(id=14)
+
+    def test_save_correct_answer(self):
+        result = Result.objects.create(
+            sample_set=self.sample_set,
+            odd_sample=Sample.objects.get(id=41)
+        )
+        self.assertTrue(result.is_correct)
+
+    def test_save_incorrect_answer(self):
+        result = Result.objects.create(
+            sample_set=self.sample_set,
+            odd_sample=Sample.objects.get(id=42)
+        )
+        self.assertFalse(result.is_correct)
+
+    def test_cannot_create_multiple_results_for_one_sample_set(self):
+        Result.objects.create(
+            sample_set=self.sample_set,
+            odd_sample=Sample.objects.get(id=42)
+        )
+        result = Result(
+            sample_set=self.sample_set,
+            odd_sample=Sample.objects.get(id=41)
+        )
+        with self.assertRaises(ValidationError) as exception:
+            result.save()
+        self.assertIn('A Result for this SampleSet already exists', exception.exception.messages)
+
+    def test_cannot_update_results_to_one_sample_set(self):
+        Result.objects.create(
+            sample_set=self.sample_set,
+            odd_sample=Sample.objects.get(id=42)
+        )
+        result = Result.objects.create(
+            sample_set=SampleSet.objects.get(id=13),
+            odd_sample=Sample.objects.get(id=38)
+        )
+        self.assertEquals(
+            Result.objects.count(),
+            2
+        )
+        result.odd_sample = Sample.objects.get(pk=41)
+        with self.assertRaises(ValidationError) as exception:
+            result.save()
+        self.assertIn('odd sample does not belong to this Sample Set', exception.exception.messages)
+
+        result.sample_set = self.sample_set
+        with self.assertRaises(ValidationError) as exception:
+            result.save()
+        self.assertIn('A Result for this SampleSet already exists', exception.exception.messages)
 
