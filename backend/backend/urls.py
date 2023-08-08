@@ -11,6 +11,9 @@ router.register('experiments', views.ExperimentViewSet, 'experiment')
 router.register('panels', views.PanelViewSet, 'panel')
 
 urlpatterns = [
+    path('', TemplateView.as_view(
+        template_name='tasex/welcome.html'
+    ), name='welcome'),
     path('admin/', admin.site.urls),
     path('temp_gui/', include('tasex.urls')),
     path('api/', include(router.urls)),
