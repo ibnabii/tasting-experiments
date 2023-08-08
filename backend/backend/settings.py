@@ -20,7 +20,7 @@ SECRET_KEY = env("SECRET_KEY", default=get_random_secret_key())
 DEBUG = env("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=['127.0.0.1'])
-
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=['127.0.0.1'])
 
 # Application definition
 
