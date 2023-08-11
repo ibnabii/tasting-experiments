@@ -42,6 +42,7 @@ class Sample(models.Model):
     class Meta:
         ordering = ('code',)
 
+
 class Panel(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
     experiment = models.ForeignKey(Experiment, on_delete=models.CASCADE, related_name='panels')
