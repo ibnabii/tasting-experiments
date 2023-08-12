@@ -42,6 +42,7 @@ class Sample(models.Model):
     class Meta:
         ordering = ('code',)
 
+
 class Panel(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
     experiment = models.ForeignKey(Experiment, on_delete=models.CASCADE, related_name='panels')
@@ -137,17 +138,64 @@ class Result(models.Model):
 
     def save(self, *args, **kwargs):
         self.validate()
-        odd_product = (Sample.objects
+        odd_product = (
+            Sample.objects
             .filter(sample_set=self.sample_set)
             .values('product_id')
             .annotate(cnt=models.Count('product_id'))
             .filter(cnt=1)
             .values_list('product_id', flat=True)[0]
         )
-        odd_sample = (Sample.objects
+        odd_sample = (
+            Sample.objects
             .filter(sample_set=self.sample_set)
             .filter(product_id=odd_product)
             .values_list('id', flat=True)[0]
         )
         self.is_correct = odd_sample == self.odd_sample.id
         super().save(*args, **kwargs)
+
+
+class ScalePoint(models.Model):
+    code = models.CharField(max_length=10)
+    text = models.CharField(max_length=50)
+    scale = models.ForeignKey('Scale', related_name='points', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'({self.code}){self.text}'
+
+
+class Scale(models.Model):
+    name = models.CharField(max_length=120)
+
+    def __str__(self):
+        return (self.name + ' - ' + ', '
+                .join([f'({point[0]}) {point[1]}' for point in self.points.values_list('code', 'text')]))
+
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=100)
+    scale = models.ForeignKey(Scale, related_name='questions', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.question_text + ' - [' + str(self.scale) + ']'
+
+
+class QuestionOrder(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question_set = models.ForeignKey('QuestionSet', on_delete=models.CASCADE)
+    order = models.PositiveSmallIntegerField()
+
+    class Meta:
+        ordering = ('question_set', 'order', 'question')
+        verbose_name = 'Question'
+        unique_together = ('question', 'question_set')
+
+
+class QuestionSet(models.Model):
+    name = models.CharField(max_length=120)
+    questions = models.ManyToManyField(Question, blank=True, through=QuestionOrder)
+
+    def __str__(self):
+        return self.name
+
