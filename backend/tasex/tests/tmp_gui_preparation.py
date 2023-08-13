@@ -145,6 +145,6 @@ class PanelAdmin(TestCase):
     def test_questions_exp_basic_default_panel_copy(self):
         self.experiment_add_question_set()
         self.panel_data.update({'create_questions': 'copy'})
-        self.create_panel()4
+        self.create_panel()
         self.verify_samples()
         self.verify_panel_questions_count(self.question_set.questions.count())
