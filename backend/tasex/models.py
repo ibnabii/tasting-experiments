@@ -212,10 +212,17 @@ class QuestionSet(models.Model):
 
 
 class PanelQuestion(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     panel = models.ForeignKey(Panel, on_delete=models.CASCADE)
     order = models.PositiveSmallIntegerField()
+    question_text = models.CharField(max_length=100)
+    scale = models.ForeignKey(Scale, related_name='panel_questions', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.question_text + ' - [' + str(self.scale) + ']'
 
     class Meta:
-        ordering = ('panel', 'order', 'question')
-        verbose_name = 'Question'
+        ordering = ('panel', 'order', 'question_text')
+        verbose_name = 'Panel question'
+        unique_together = (
+            ('panel', 'order'),
+        )

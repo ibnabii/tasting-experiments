@@ -69,6 +69,7 @@ class PanelAdmin(admin.ModelAdmin):
         class Tabular(admin.TabularInline):
             model = PanelQuestion
             extra = 0
+            classes = ['collapse']
 
         self.inlines = (Tabular,)
         self.form = PanelFormChange
@@ -77,16 +78,15 @@ class PanelAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         # copy questions from experiment on panel creation and user chose to copy
         if not change and form.cleaned_data.get('create_questions', None) == 'copy':
-            for question_order in obj.experiment.question_set.question_order.all():
-                question = question_order.question
-                question.id = None
-                question.save()
-                PanelQuestion.objects.create(
-                    question=question,
+            PanelQuestion.objects.bulk_create([
+                PanelQuestion(
                     panel=obj,
-                    order=question_order.order
+                    order=question_order.order,
+                    question_text=question_order.question.question_text,
+                    scale=question_order.question.scale
                 )
-
+                for question_order in obj.experiment.question_set.question_order.all()
+            ])
 
         super().save_model(request, obj, form, change)
 
@@ -153,6 +153,11 @@ class QuestionSetAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(PanelQuestion)
+class PanelQuestionAdmin(admin.ModelAdmin):
     pass
 
 # for debug: check session data in admin module
