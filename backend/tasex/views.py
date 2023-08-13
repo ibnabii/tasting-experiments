@@ -12,7 +12,7 @@ from rest_framework import viewsets, permissions
 from .forms import FORM_CLASSES
 from .models import Experiment, Panel, Sample, SampleSet, Product, Result
 from .serializers import ExperimentSerializer, PanelSerializer
-
+from .utils import PanelResult
 
 class ExperimentViewSet(viewsets.ModelViewSet):
     serializer_class = ExperimentSerializer
@@ -68,6 +68,19 @@ class AdminPanelView(LoginRequiredMixin, DetailView):
     model = Panel
     # 404 instead of redirect to login page for not logged-in user
     # raise_exception = True
+
+
+class ResultsView(DetailView):
+    model = Panel
+    template_name = 'tasex/panel_results.html'
+    context_object_name = 'panel'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context["panel_result"] = PanelResult(self.object)
+        return context
 
 
 class PanelState:
@@ -148,7 +161,7 @@ class AnonymousPanelView(DetailView):
             case Panel.PanelStatus.PLANNED:
                 self.template_name = 'tasex/panel_planned.html'
             case Panel.PanelStatus.PRESENTING_RESULTS:
-                self.template_name = 'tasex/panel_results.html'
+                return ResultsView.as_view()(request, *args, **kwargs)
 
             case Panel.PanelStatus.ACCEPTING_ANSWERS:
                 # if panel is accepting_answers, the status of the user will be saved

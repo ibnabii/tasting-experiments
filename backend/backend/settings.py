@@ -2,6 +2,10 @@ from pathlib import Path
 
 from django.core.management.utils import get_random_secret_key
 import environ
+import matplotlib
+
+# use non-interactive backend for generating plots
+matplotlib.use('agg')
 
 env = environ.Env()
 environ.Env.read_env()
@@ -20,7 +24,7 @@ SECRET_KEY = env("SECRET_KEY", default=get_random_secret_key())
 DEBUG = env("DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=['127.0.0.1'])
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=['127.0.0.1'])
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=['http://127.0.0.1'])
 
 # Application definition
 
