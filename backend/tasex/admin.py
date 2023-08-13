@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .forms import ExperimentForm, PanelForm
-from .models import Experiment, Panel, Product, SampleSet, Sample, Result, Scale, ScalePoint, Question, QuestionSet
+from .forms import ExperimentForm, PanelFormAdd, PanelFormChange
+from .models import (Experiment, Panel, Product, SampleSet, Sample, Result, Scale, ScalePoint,
+                     Question, QuestionSet, PanelQuestion)
 
 
 @admin.register(Experiment)
@@ -32,7 +33,6 @@ class ExperimentAdmin(admin.ModelAdmin):
 
 @admin.register(Panel)
 class PanelAdmin(admin.ModelAdmin):
-    form = PanelForm
     readonly_fields = (
         'created_at',
         'modified_at',
@@ -52,12 +52,48 @@ class PanelAdmin(admin.ModelAdmin):
     )
     ordering = (
         'experiment',
-        'closed_at',
-        'created_at',
+        '-closed_at',
+        '-created_at',
     )
 
-    def temp_gui(self, obj):
+    @staticmethod
+    def temp_gui(obj):
         return mark_safe('<a href="%s">Temp GUI</a>' % obj.get_absolute_url())
+
+    def add_view(self, request, form_url="", extra_context=None):
+        self.form = PanelFormAdd
+        self.inlines = tuple(())
+        return super().add_view(request, form_url, extra_context)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        class Tabular(admin.TabularInline):
+            model = PanelQuestion
+            extra = 0
+
+        self.inlines = (Tabular,)
+        self.form = PanelFormChange
+        return super().change_view(request, object_id, form_url, extra_context)
+    
+    def save_model(self, request, obj, form, change):
+        # copy questions from experiment on panel creation and user chose to copy
+        if not change and form.cleaned_data.get('create_questions', None) == 'copy':
+            for question_order in obj.experiment.question_set.question_order.all():
+                question = question_order.question
+                question.id = None
+                question.save()
+                PanelQuestion.objects.create(
+                    question=question,
+                    panel=obj,
+                    order=question_order.order
+                )
+
+
+        super().save_model(request, obj, form, change)
+
+
+class QuestionInQuestionSetAdmin(admin.TabularInline):
+    model = QuestionSet.questions.through
+    extra = 0
 
 
 @admin.register(Product)

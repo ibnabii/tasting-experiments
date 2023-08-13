@@ -24,6 +24,14 @@ class Experiment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     product_A = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='+')
     product_B = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='+')
+    question_set = models.ForeignKey(
+        'QuestionSet',
+        on_delete=models.SET_NULL,
+        related_name='experiment',
+        help_text='Default question set for panels in this experiment',
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.title
@@ -183,13 +191,16 @@ class Question(models.Model):
 
 class QuestionOrder(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    question_set = models.ForeignKey('QuestionSet', on_delete=models.CASCADE)
+    question_set = models.ForeignKey('QuestionSet', on_delete=models.CASCADE, related_name='question_order')
     order = models.PositiveSmallIntegerField()
 
     class Meta:
         ordering = ('question_set', 'order', 'question')
         verbose_name = 'Question'
-        unique_together = ('question', 'question_set')
+        unique_together = (
+            ('question', 'question_set'),
+            ('question_set', 'order'),
+        )
 
 
 class QuestionSet(models.Model):
@@ -199,3 +210,12 @@ class QuestionSet(models.Model):
     def __str__(self):
         return self.name
 
+
+class PanelQuestion(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    panel = models.ForeignKey(Panel, on_delete=models.CASCADE)
+    order = models.PositiveSmallIntegerField()
+
+    class Meta:
+        ordering = ('panel', 'order', 'question')
+        verbose_name = 'Question'

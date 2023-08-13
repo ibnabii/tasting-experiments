@@ -24,13 +24,32 @@ class ExperimentForm(forms.ModelForm):
         model = Experiment
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        question_set_widget = self.fields['question_set'].widget
+        question_set_widget.can_change_related = False
+        question_set_widget.can_delete_related = False
 
-class PanelForm(forms.ModelForm):
+
+class PanelFormAdd(forms.ModelForm):
     experiment = InternalNameChoiceField(queryset=Experiment.objects)
+    create_questions = forms.ChoiceField(
+        choices=(
+            ('copy', "Copy questions from experiment's default question set"),
+            ('blank', 'Let me create questions on my own')
+        ),
+        initial='copy'
+    )
 
     class Meta:
         model = Panel
         fields = '__all__'
+
+
+class PanelFormChange(forms.ModelForm):
+    class Meta:
+        model = Panel
+        exclude = ('experiment', 'planned_panelists')
 
 
 
