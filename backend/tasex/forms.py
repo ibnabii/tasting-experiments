@@ -52,7 +52,6 @@ class PanelFormChange(forms.ModelForm):
         exclude = ('experiment', 'planned_panelists')
 
 
-
 class GenericPanelForm(forms.Form):
     def __init__(self, **kwargs):
         self.panel_state = kwargs.pop('panel_state')

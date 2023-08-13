@@ -71,6 +71,13 @@ class PanelAdmin(admin.ModelAdmin):
             extra = 0
             classes = ['collapse']
 
+            def formfield_for_dbfield(self, db_field, **kwargs):
+                formfield = super().formfield_for_dbfield(db_field, **kwargs)
+                if db_field.name == 'scale':
+                    formfield.widget.can_delete_related = False
+                    formfield.widget.can_change_related = False
+                return formfield
+
         self.inlines = (Tabular,)
         self.form = PanelFormChange
         return super().change_view(request, object_id, form_url, extra_context)
