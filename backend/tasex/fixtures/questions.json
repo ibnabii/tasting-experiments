@@ -1,0 +1,250 @@
+[
+{
+  "model": "tasex.scale",
+  "pk": 6660001,
+  "fields": {
+    "name": "Tak/Nie"
+  }
+},
+{
+  "model": "tasex.scale",
+  "pk": 6660002,
+  "fields": {
+    "name": "3 wybory"
+  }
+},
+{
+  "model": "tasex.scale",
+  "pk": 6660003,
+  "fields": {
+    "name": "Likert-7"
+  }
+},
+{
+  "model": "tasex.scale",
+  "pk": 6660004,
+  "fields": {
+    "name": "Likert-produkt"
+  }
+},
+{
+  "model": "tasex.question",
+  "pk": 66600010,
+  "fields": {
+    "question_text": "Czy różnica pomiędzy próbkami była łatwa do zauważenia?",
+    "scale": 6660003
+  }
+},
+{
+  "model": "tasex.question",
+  "pk": 66600011,
+  "fields": {
+    "question_text": "Który produkt preferujesz?",
+    "scale": 6660004
+  }
+},
+{
+  "model": "tasex.question",
+  "pk": 66600012,
+  "fields": {
+    "question_text": "Czy wybierając niepasującą próbkę zgadywałeś/aś?",
+    "scale": 6660001
+  }
+},
+{
+  "model": "tasex.questionset",
+  "pk": 6660001,
+  "fields": {
+    "name": "Basic"
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 1,
+  "fields": {
+    "code": "t",
+    "text": "Tak",
+    "scale": 6660001
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 2,
+  "fields": {
+    "code": "n",
+    "text": "Nie",
+    "scale": 6660001
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 3,
+  "fields": {
+    "code": "t",
+    "text": "Tak",
+    "scale": 6660002
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 4,
+  "fields": {
+    "code": "n",
+    "text": "Nie",
+    "scale": 6660002
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 5,
+  "fields": {
+    "code": "nw",
+    "text": "Nie wiem",
+    "scale": 6660002
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 6,
+  "fields": {
+    "code": "zn",
+    "text": "Zdecydowanie nie",
+    "scale": 6660003
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 7,
+  "fields": {
+    "code": "n",
+    "text": "Nie",
+    "scale": 6660003
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 8,
+  "fields": {
+    "code": "cn",
+    "text": "Chyba nie",
+    "scale": 6660003
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 9,
+  "fields": {
+    "code": "w",
+    "text": "Nie wiem",
+    "scale": 6660003
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 10,
+  "fields": {
+    "code": "ct",
+    "text": "Chyba tak",
+    "scale": 6660003
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 11,
+  "fields": {
+    "code": "t",
+    "text": "Tak",
+    "scale": 6660003
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 12,
+  "fields": {
+    "code": "zt",
+    "text": "Zdecydowanie tak",
+    "scale": 6660003
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 13,
+  "fields": {
+    "code": "za",
+    "text": "Zdecydowanie produkt A",
+    "scale": 6660004
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 14,
+  "fields": {
+    "code": "a",
+    "text": "Produkt A",
+    "scale": 6660004
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 15,
+  "fields": {
+    "code": "ca",
+    "text": "Chyba produkt A",
+    "scale": 6660004
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 16,
+  "fields": {
+    "code": "nw",
+    "text": "Nie mam zdania",
+    "scale": 6660004
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 17,
+  "fields": {
+    "code": "cb",
+    "text": "Chyba produkt B",
+    "scale": 6660004
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 18,
+  "fields": {
+    "code": "b",
+    "text": "Produkt B",
+    "scale": 6660004
+  }
+},
+{
+  "model": "tasex.scalepoint",
+  "pk": 19,
+  "fields": {
+    "code": "zb",
+    "text": "Zdecydowanie produkt B",
+    "scale": 6660004
+  }
+},
+{
+  "model": "tasex.questionorder",
+  "pk": 6,
+  "fields": {
+    "question": 66600011,
+    "question_set": 6660001,
+    "order": 1
+  }
+},
+{
+  "model": "tasex.questionorder",
+  "pk": 7,
+  "fields": {
+    "question": 66600010,
+    "question_set": 6660001,
+    "order": 2
+  }
+}
+]

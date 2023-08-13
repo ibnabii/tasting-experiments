@@ -84,7 +84,9 @@ class PanelAdmin(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         # copy questions from experiment on panel creation and user chose to copy
-        if not change and form.cleaned_data.get('create_questions', None) == 'copy':
+        if (not change
+                and form.cleaned_data.get('create_questions', None) == 'copy')\
+                and obj.experiment.question_set:
             PanelQuestion.objects.bulk_create([
                 PanelQuestion(
                     panel=obj,

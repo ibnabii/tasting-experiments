@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from ..models import Experiment, Product, Panel, SampleSet, Sample
+from ..models import Experiment, Product, Panel, SampleSet, Sample, PanelQuestion, QuestionSet
 from ..forms import FORM_CLASSES
 
 
@@ -81,3 +81,70 @@ class PanelViewTest(TestCase):
         response = c.get(self.panel_results.get_absolute_url())
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'tasex/admin_panel.html')
+
+
+class PanelAdmin(TestCase):
+    fixtures = ['questions', 'test_base']
+
+    def setUp(self):
+        self.question_set = QuestionSet.objects.get(id=6660001)
+        self.panel_data = {
+            'experiment': 'aaa66601-3b2e-4695-bc78-d1becc8428c7',
+            'description': 'Test description',
+            'planned_panelists': 3,
+            'show_exp_description': 'NO',
+            'status': 'PLANNED',
+            'create_questions': 'blank',
+        }
+        self.url = '/admin/tasex/panel/add/'
+        self.user_super = User.objects.create_superuser('super_user', 'mail@mail.com', 'super_password')
+        self.c = Client()
+        self.c.force_login(self.user_super)
+
+    def verify_samples(self):
+        self.assertEquals(
+            SampleSet.objects.count(),
+            self.panel_data.get('planned_panelists', None)
+        )
+        self.assertEquals(
+            Sample.objects.count(),
+            self.panel_data.get('planned_panelists') * 3
+        )
+
+    def create_panel(self):
+        response = self.c.post(self.url, follow=True, data=self.panel_data)
+        self.assertEquals(response.status_code, 200)
+        return response
+
+    def verify_panel_questions_count(self, expected):
+        self.assertEquals(
+            PanelQuestion.objects.count(),
+            expected
+        )
+
+    def experiment_add_question_set(self):
+        Experiment.objects.filter(id=self.panel_data.get('experiment')).update(question_set=self.question_set)
+
+    def test_questions_exp_no_default_panel_blank(self):
+        self.create_panel()
+        self.verify_samples()
+        self.verify_panel_questions_count(0)
+
+    def test_questions_exp_no_default_panel_copy(self):
+        self.panel_data.update({'create_questions': 'copy'})
+        self.create_panel()
+        self.verify_samples()
+        self.verify_panel_questions_count(0)
+
+    def test_questions_exp_basic_panel_blank(self):
+        self.experiment_add_question_set()
+        self.create_panel()
+        self.verify_samples()
+        self.verify_panel_questions_count(0)
+
+    def test_questions_exp_basic_default_panel_copy(self):
+        self.experiment_add_question_set()
+        self.panel_data.update({'create_questions': 'copy'})
+        self.create_panel()4
+        self.verify_samples()
+        self.verify_panel_questions_count(self.question_set.questions.count())
