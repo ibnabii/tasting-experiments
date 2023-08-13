@@ -148,3 +148,7 @@ class PanelAdmin(TestCase):
         self.create_panel()
         self.verify_samples()
         self.verify_panel_questions_count(self.question_set.questions.count())
+        for question_order in self.question_set.question_order.all():
+            panel_question = PanelQuestion.objects.get(question_text=question_order.question.question_text)
+            self.assertEquals(panel_question.order, question_order.order)
+            self.assertEquals(panel_question.scale, question_order.question.scale)
