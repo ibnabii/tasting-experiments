@@ -226,3 +226,13 @@ class PanelQuestion(models.Model):
         unique_together = (
             ('panel', 'order'),
         )
+
+    def delete(self, **kwargs):
+        if self.panel.status != Panel.PanelStatus.PLANNED:
+            raise ValidationError('Cannot delete questions once panel is started!')
+        super().delete(**kwargs)
+
+    def save(self, **kwargs):
+        if self.panel.status != Panel.PanelStatus.PLANNED:
+            raise ValidationError('Cannot add questions once panel is started!')
+        super().save(**kwargs)
