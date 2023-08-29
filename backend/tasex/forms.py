@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 
-from .models import Product, Experiment, Panel, Sample
+from .models import Product, Experiment, Panel, Sample, PanelQuestion
 
 
 class InternalNameChoiceField(forms.ModelChoiceField):
@@ -50,6 +50,19 @@ class PanelFormChange(forms.ModelForm):
     class Meta:
         model = Panel
         exclude = ('experiment', 'planned_panelists')
+
+
+class PanelQuestionsForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        questions = kwargs.pop('questions', PanelQuestion.objects.none())
+        super().__init__(*args, **kwargs)
+        for question in questions:
+            self.fields[question.id] = forms.ChoiceField(
+                required=True,
+                choices=question.scale.points.values_list('code', 'text'),
+                widget=forms.RadioSelect,
+                label=question.question_text
+            )
 
 
 class GenericPanelForm(forms.Form):

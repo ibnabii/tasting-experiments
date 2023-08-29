@@ -236,3 +236,10 @@ class PanelQuestion(models.Model):
         if self.panel.status != Panel.PanelStatus.PLANNED:
             raise ValidationError('Cannot add questions once panel is started!')
         super().save(**kwargs)
+
+
+class Answer(models.Model):
+    question = models.ForeignKey(PanelQuestion, on_delete=models.CASCADE, related_name='answers')
+    result = models.ForeignKey(Result, on_delete=models.CASCADE, related_name='answers')
+    answer_code = models.CharField(max_length=10)
+    answer_text = models.CharField(max_length=50)

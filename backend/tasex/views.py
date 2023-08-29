@@ -9,10 +9,11 @@ from django.views.generic import DetailView, FormView, ListView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 
-from .forms import FORM_CLASSES
-from .models import Experiment, Panel, Sample, SampleSet, Product, Result
+from .forms import FORM_CLASSES, PanelQuestionsForm
+from .models import Experiment, Panel, Sample, SampleSet, Product, Result, PanelQuestion
 from .serializers import ExperimentSerializer, PanelSerializer
 from .utils import PanelResult
+
 
 class ExperimentViewSet(viewsets.ModelViewSet):
     serializer_class = ExperimentSerializer
@@ -145,6 +146,54 @@ class PanelStep1(FormView):
         return super().setup(request, *args, **kwargs)
 
 
+class PanelQuestionsView(FormView):
+    form_class = PanelQuestionsForm
+    template_name = 'tasex/panel_questions.html'
+
+    def __init__(self):
+        super().__init__()
+        self.panel_id = None
+        self.panel_state = None
+
+    def setup(self, request, *args, **kwargs):
+        self.panel_id = kwargs.get('pk')
+        self.panel_state = PanelState(**request.session.get('panels').get(self.panel_id))
+        return super().setup(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        # form_kwargs['panel_state'] = self.panel_state
+        form_kwargs['questions'] = PanelQuestion.objects.filter(panel_id=self.panel_id)
+        return form_kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product_a = Panel.objects.get(id=self.panel_id).experiment.product_A
+        result = Result.objects.get(id=self.panel_state.result)
+        odd = result.odd_sample
+        other = list(result.sample_set.samples.values_list('code', flat=True))
+        other.remove(odd.code)
+        if odd.product == product_a:
+            context['product_a'] = [odd.code]
+            context['product_b'] = other
+        else:
+            context['product_b'] = [odd.code]
+            context['product_a'] = other
+
+        return context
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+
+        self.panel_state.step += 1
+        self.request.session.get('panels')[self.panel_id] = self.panel_state.__dict__
+        self.request.session.save()
+
+        return HttpResponseRedirect(
+            reverse('tasex:panel', kwargs={'pk': self.kwargs.get('pk')})
+        )
+
+
 class AnonymousPanelView(DetailView):
     model = Panel
     template_name = 'tasex/panel_closed.html'
@@ -180,6 +229,8 @@ class AnonymousPanelView(DetailView):
                 step = (request.session.get('panels', {}).get(panel_id, {}).get('step'))
                 if step in FORM_CLASSES:
                     return PanelStep1.as_view()(request, *args, **kwargs)
+                elif step == len(FORM_CLASSES) + 1:
+                    return PanelQuestionsView.as_view()(request, *args, **kwargs)
                 else:
                     self.template_name = 'tasex/panel_wait_for_finish.html'
             case _:
