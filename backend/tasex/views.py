@@ -266,7 +266,7 @@ class AnonymousPanelView(DetailView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class UpdatePanelStatusView(RedirectView):
+class UpdatePanelStatusView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         return reverse('tasex:panel', kwargs={'pk': self.kwargs.get('pk')})
 
