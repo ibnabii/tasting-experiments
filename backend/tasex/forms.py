@@ -64,6 +64,13 @@ class PanelQuestionsForm(forms.Form):
                 label=question.question_text
             )
 
+    def clean(self):
+        for question in self.fields:
+            answer = self.data.get(str(question))
+            if answer and answer in PanelQuestion.objects.get(id=question).scale.points.values_list('code', flat=True):
+                self.errors.pop(question)
+        return self.data
+
 
 class GenericPanelForm(forms.Form):
     def __init__(self, **kwargs):

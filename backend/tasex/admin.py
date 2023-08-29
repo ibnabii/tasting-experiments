@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 
 from .forms import ExperimentForm, PanelFormAdd, PanelFormChange
 from .models import (Experiment, Panel, Product, SampleSet, Sample, Result, Scale, ScalePoint,
-                     Question, QuestionSet, PanelQuestion)
+                     Question, QuestionSet, PanelQuestion, Answer)
 
 
 @admin.register(Experiment)
@@ -169,6 +169,9 @@ class QuestionAdmin(admin.ModelAdmin):
 class PanelQuestionAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(Answer)
+class AnswerAdmin(admin.ModelAdmin):
+    pass
 # for debug: check session data in admin module
 # from django.contrib.sessions.models import Session
 #
@@ -180,3 +183,4 @@ class PanelQuestionAdmin(admin.ModelAdmin):
 #
 #     list_display = ['session_key', '_session_data', 'expire_date']
 #     ordering = ['-expire_date']
+

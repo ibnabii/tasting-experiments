@@ -1,7 +1,7 @@
 import qrcode
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import BadRequest, PermissionDenied
+from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 # from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import reverse
@@ -10,7 +10,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 
 from .forms import FORM_CLASSES, PanelQuestionsForm
-from .models import Experiment, Panel, Sample, SampleSet, Product, Result, PanelQuestion
+from .models import Experiment, Panel, Sample, SampleSet, Product, Result, PanelQuestion, Answer
+
 from .serializers import ExperimentSerializer, PanelSerializer
 from .utils import PanelResult
 
@@ -183,12 +184,25 @@ class PanelQuestionsView(FormView):
         return context
 
     def form_valid(self, form):
-        print(form.cleaned_data)
-
+        # increment panel_state.step
         self.panel_state.step += 1
         self.request.session.get('panels')[self.panel_id] = self.panel_state.__dict__
         self.request.session.save()
 
+        # save answers
+        result = Result.objects.get(id=self.panel_state.result)
+        if Answer.objects.filter(result=result).exists():
+            raise ValidationError('Answers already recorded')
+        for question in PanelQuestion.objects.filter(panel_id=self.panel_id):
+            answer = form.cleaned_data.get(str(question.id))
+            if answer:
+                answer_text = question.scale.points.get(code=answer).text
+                Answer.objects.create(
+                    question=question,
+                    result=result,
+                    answer_code=answer,
+                    answer_text=answer_text
+                )
         return HttpResponseRedirect(
             reverse('tasex:panel', kwargs={'pk': self.kwargs.get('pk')})
         )
