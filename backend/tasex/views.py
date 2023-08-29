@@ -13,7 +13,7 @@ from .forms import FORM_CLASSES, PanelQuestionsForm
 from .models import Experiment, Panel, Sample, SampleSet, Product, Result, PanelQuestion, Answer
 
 from .serializers import ExperimentSerializer, PanelSerializer
-from .utils import PanelResult
+from .utils import PanelResult, SurveyPlots
 
 
 class ExperimentViewSet(viewsets.ModelViewSet):
@@ -94,6 +94,7 @@ class ResultsView(DetailView):
         context = super().get_context_data(**kwargs)
         # Add in a QuerySet of all the books
         context["panel_result"] = PanelResult(self.object)
+        context["survey_plots"] = SurveyPlots(self.object)
         return context
 
 
