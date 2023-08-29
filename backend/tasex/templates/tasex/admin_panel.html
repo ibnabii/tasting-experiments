@@ -2,7 +2,19 @@
 <h2>{{ object.experiment.internal_title }}</h2>
 <h3>{{ object.experiment.title }}</h3>
 {{  object.experiment.description }}
+<h4>Product A: {{ object.experiment.product_A.name }} / {{ object.experiment.product_A.internal_name }}</h4>
+<h4>Product B: {{ object.experiment.product_B.name }} / {{ object.experiment.product_B.internal_name }}</h4>
 <h1>Panel</h1>
+
+<h3>Status: ({{ object.status }})</h3>
+Change to: <br/>
+{% for status in statuses %}
+<a href="{% url 'tasex:panel-update-status' object.id status %}">{{ status }}</a><br/>
+{%  endfor %}
+
+<h3>Odd product identifications: {{ results }} / {{ object.planned_panelists }}</h3>
+<h3>Survey answers: {{ answers }} / {{ object.planned_panelists }}</h3>
+
 <h4>{{ object.description }}</h4>
 
 <a href="{% url 'tasex:panel-qr' object.id %}">Get QR code</a><br/>

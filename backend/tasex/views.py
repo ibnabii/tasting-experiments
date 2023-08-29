@@ -5,7 +5,7 @@ from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 # from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import reverse
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import DetailView, FormView, ListView, RedirectView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 
@@ -70,6 +70,18 @@ class AdminPanelView(LoginRequiredMixin, DetailView):
     model = Panel
     # 404 instead of redirect to login page for not logged-in user
     # raise_exception = True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        panel = self.kwargs.get('pk')
+        context['statuses'] = Panel.PanelStatus
+        if panel:
+            results = Result.objects.filter(sample_set__in=SampleSet.objects.filter(panel_id=panel))
+            context['results'] = results.count()
+            answers = Answer.objects.filter(result__in=results)
+            questions = PanelQuestion.objects.filter(panel_id=panel)
+            context['answers'] = answers.count() // questions.count()
+        return context
 
 
 class ResultsView(DetailView):
@@ -251,6 +263,17 @@ class AnonymousPanelView(DetailView):
                 # for debug
                 raise BadRequest(f'I do not know what to do with panel status {self.get_object().status}')
         return super().dispatch(request, *args, **kwargs)
+
+
+class UpdatePanelStatusView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse('tasex:panel', kwargs={'pk': self.kwargs.get('pk')})
+
+    def get(self, request, *args, **kwargs):
+        new_status = self.kwargs.get('status')
+        if new_status in Panel.PanelStatus:
+            Panel.objects.filter(id=self.kwargs.get('pk')).update(status=new_status)
+        return super().get(request, *args, **kwargs)
 
 
 class PanelView(DetailView):
