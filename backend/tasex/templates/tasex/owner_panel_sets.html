@@ -1,10 +1,13 @@
-<html><head>
-
-{% load static %}
-<link rel="stylesheet" href="{% static 'tasex/owner.css' %}">
-
-</head><body>
-<table class="simple">
+{#<html><head>#}
+{##}
+{#{% load static %}#}
+{#<link rel="stylesheet" href="{% static 'tasex/owner.css' %}">#}
+{##}
+{#</head><body>#}
+{%  include 'tasex/header.html' %}
+{#<table class="simple">#}
+<div class="container">
+<table class="table table-striped">
 <thead>
     <tr><th>Lp</th><th>Próbka 1</th><th>Próbka 2</th><th>Próbka 3</th></tr>
 </thead>
@@ -19,4 +22,6 @@
 {% endfor %}
 </tbody>
 </table>
-</body></html>
+</div>
+{% include 'tasex/footer.html' %}
+{#</body></html>#}

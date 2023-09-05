@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'tasex',
+    'bootstrap5'
 ]
 
 MIDDLEWARE = [
