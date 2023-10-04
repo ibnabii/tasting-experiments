@@ -8,7 +8,11 @@
 - [ ] Automate puml -> svg/png rendering (https://github.com/grassedge/generate-plantuml-action/tree/master)
 - [ ] define testing strategy
 - [ ] define workflow automation
-## documentation
-- [x] create conceptual model
-- [ ] ~~create data model~~
-- [ ] ~~define architecture~~
+## Functional
+- [ ] cookies information
+- [ ] i18n
+- [ ] separate panels for users
+- [ ] common items  for all users
+- [ ] admin panel for researchers
+## UI
+- [ ] boostrap style the forms for user

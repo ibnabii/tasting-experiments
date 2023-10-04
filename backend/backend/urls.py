@@ -16,6 +16,7 @@ urlpatterns = [
     ), name='welcome'),
     path('admin/', admin.site.urls),
     path('temp_gui/', include('tasex.urls')),
+    path('demo/', include('demo.urls')),
     path('api/', include(router.urls)),
     path('api/swagger-ui/', TemplateView.as_view(
         template_name='tasex/swagger-ui.html',

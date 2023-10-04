@@ -1,0 +1,29 @@
+@startuml
+|#gold|R| Reasearcher
+|#AntiqueWhite|P| Panelist
+|R|
+start
+:Define Experiment:
+products, questions;
+:Create Panel;
+:(Optional) Edit Panel questions;
+:Prepare samples (app generates ids);
+:Group samples into sets (app defined);
+:Distribute sample sets to panelists;
+:Provide Panelists with link to Panel;
+|P|
+:Check if sample set is correct (app aided);
+:Identify the odd sample;
+:Answer additional question sdefined by the Reasearcher;
+|R|
+:Close the Panel;
+fork
+    :Check the results, app calculates the p-value and stats;
+fork again
+    |P|
+    :Check the results, app calculates the p-value and stats;
+|R|
+end fork
+stop
+
+@enduml

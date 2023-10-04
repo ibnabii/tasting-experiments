@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 # from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import reverse
+from django.shortcuts import reverse, get_object_or_404
 from django.views.generic import DetailView, FormView, ListView, RedirectView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
@@ -80,7 +80,10 @@ class AdminPanelView(LoginRequiredMixin, DetailView):
             context['results'] = results.count()
             answers = Answer.objects.filter(result__in=results)
             questions = PanelQuestion.objects.filter(panel_id=panel)
-            context['answers'] = answers.count() // questions.count()
+            if questions.count():
+                context['answers'] = answers.count() // questions.count()
+            else:
+                context['answers'] = 'No questions asked'
         return context
 
 
@@ -92,6 +95,9 @@ class ResultsView(DetailView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
+        if not Result.objects.filter(sample_set__panel=self.object).exists():
+            self.template_name = 'tasex/panel_results_empty.html'
+            return context
         # Add in a QuerySet of all the books
         context["panel_result"] = PanelResult(self.object)
         context["survey_plots"] = SurveyPlots(self.object)
@@ -244,7 +250,7 @@ class AnonymousPanelView(DetailView):
                 panel_id = str(self.get_object().id)
 
                 # save session
-                if not request.session or not request.session.session_key:
+                if not request.session or not request.session.session_key or not request.session.get('panels'):
                     request.session['panels'] = {}
                     request.session.save()
                 # update session with this panel
@@ -291,7 +297,7 @@ def render_qr_code(request, pk):
     if (
         request.user.is_anonymous
         and
-        Panel.objects.filter(id=pk).values_list('status')[0][0] == Panel.PanelStatus.HIDDEN
+        get_object_or_404(Panel, id=pk).status == Panel.PanelStatus.HIDDEN
     ):
         raise PermissionDenied
     qr = qrcode.QRCode(

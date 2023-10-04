@@ -1,0 +1,266 @@
+{% extends 'demo/base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="modal fade" id="QR" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="qrImg"
+                     class="img-responsive"
+                     src=""
+                     alt="scan to get the link"
+                     width="100%"
+                />
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="fakeModal" class="modal hide" data-backdrop="static" data-keyboard="false"></div>
+
+    <script>
+    $(document).on("click", ".openQrModal", function () {
+    var qrSrc = $(this).data('id');
+    $(".modal-body #qrImg").attr("src", qrSrc);
+    });
+    </script>
+
+
+    <p>
+       If you do not know what triangle tests are, check out <a target="_blank" href="https://www.sensorysociety.org/knowledge/sspwiki/Pages/Triangle%20Test.aspx">this site</a>
+    </p>
+    <div class="accordion" id="appDescription">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="flow">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+              <span class="lead">The flow</span>
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="flow" data-bs-parent="#appDescription">
+          <div class="accordion-body">
+              <img src="{% static '/demo/flow.png' %}" alt="Action diagram"/>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="features">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              <span class="lead">Features overview</span>
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="features" data-bs-parent="#appDescription">
+          <div class="accordion-body">
+              <p><strong>Define experiment. </strong> You may want to run more than one panel for the experiment -
+                you can create default set of questions that will be asked after odd sample identification.
+                Only answers from Panelists, who correctly identified the odd sample are used in stats calculation.
+              </p>
+              <p>
+                  <strong>Create panel.</strong> You can change the questions copied from experiment definition if you want.
+              </p>
+              <p><strong>Prepare the samples.</strong> App provides you with easy to use list of random sample ids.
+                  You will prepare equal number of samples of both products, as some Panelists will be served AAB sample set,
+                  while others will get ABB sample set.
+                  Sample preparation lists groups sample ids by product for easy preparation.
+              </p>
+              <p>
+                  <strong>Serve the samples.</strong> App provides you with sample set lists so it's easy to assemble
+                  previously prepared samples into sets ensuring random distribution. The Panelist's questionnaire's
+                  first step verifies the sample set is correct.
+              </p>
+              <p>
+                  <strong>Share the link to panel's questionnaire. </strong> There's no easier way than to show the QR
+                  code to scan the link.
+              </p>
+              <p>
+                 <strong>Gather the answers.</strong> Let the Panelists select the odd sample, followed by custom questions
+                  defined for the panel (eg. 'Which product do you like more?').
+              </p>
+              <p>
+                  <strong>Get the results</strong> The app calculates the p-value for the 'Samples are indistinguishable'
+                  hypothesis. It also calculates the statistics for custom questions, dismissing answers provided by Panelists,
+                  who failed to identify the odd sample.
+              </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="sampleResults">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            <span class="lead">See the results of example panels</span>
+          </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="sampleResults" data-bs-parent="#appDescription">
+          <div class="accordion-body">
+            <table class="table table-hover">
+                <tr>
+                    <td>Significant amount of odd sample identification</td>
+                    <td>
+                        <a class="btn btn-outline-primary"
+                           href="{% url 'tasex:panel' result_significant_id %}"
+                           target="_blank">Open in new tab</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-outline-primary openQrModal"
+                           data-id="{% url 'tasex:panel-qr' result_significant_id %}"
+                           data-bs-toggle="modal"
+                           data-bs-target="#QR">QR link</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Too few odd sample identification to conclude samples differ</td>
+                    <td>
+                        <a class="btn btn-outline-primary"
+                           href="{% url 'tasex:panel' result_indistinguishable_id %}"
+                           target="_blank">Open in new tab</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-outline-primary openQrModal"
+                           data-id="{% url 'tasex:panel-qr' result_indistinguishable_id %}"
+                           data-bs-toggle="modal"
+                           data-bs-target="#QR">QR link</a>
+                    </td>
+                </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+       <div class="accordion-item">
+        <h2 class="accordion-header" id="playground">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            <span class="lead">Play with your own panel</span>
+          </button>
+        </h2>
+        <div id="collapseFour"
+             class="accordion-collapse collapse {% if current_tab == 'own_panel' %}
+                show
+                {% endif %}"
+             aria-labelledby="playground"
+             data-bs-parent="#appDescription"
+        >
+          <div class="accordion-body">
+          <p>We have created a panel for you:<ul>
+              <li>10 panelists</li>
+              <li>3 extra questions</li>
+          </ul></p>
+              <p>Set panel status to <strong>ACCEPT ANSWERS</strong> and open the panel as panelist in separate tab or scan the QR code and open on your mobile.
+                  Fill in the form using samples' codes provided below (refresh after you've used them to get a new set).
+              Generate random answers (in two modes) to finish the panel. Set status to <strong>SHOW RESULTS</strong>  to view the results of your panel</p>
+          {% if sample_set %}
+              <p>Here is the list of sample codes you can use to fill the panel form:</p>
+              <ol>
+              {% for sample in sample_set %}
+                  <li>{{ sample }}</li>
+              {% endfor %}
+              </ol>
+          {% endif %}
+
+            <table class="table table-hover">
+                <tr>
+                    <td>Change status of the panel</td>
+                    <td>
+                        <form action="{% url 'demo:change_panel_status' %}" method="post">
+                        {% csrf_token %}
+                            <input type="hidden" name="set_status">
+                            <button class="btn
+                                {% if panel.status == 'PLANNED' %}
+                                    btn-primary
+                                {% else %}
+                                    btn-outline-primary
+                                {% endif %}"
+                                onclick="
+                                set_status.value='PLANNED'; form.submit();
+                            ">Planned</button>
+                             <button class="btn
+                                {% if panel.status == 'ACCEPTING_ANSWERS' %}
+                                    btn-primary
+                                {% else %}
+                                    btn-outline-primary
+                                {% endif %}"
+                                onclick="
+                                set_status.value='ACCEPTING_ANSWERS'; form.submit();
+                            ">Accepts answers</button>
+                             <button class="btn
+                                {% if panel.status == 'PRESENTING_RESULTS' %}
+                                    btn-primary
+                                {% else %}
+                                    btn-outline-primary
+                                {% endif %}"
+                                onclick="
+                                set_status.value='PRESENTING_RESULTS'; form.submit();
+                            ">Show results</button>
+                             <button class="btn
+                                {% if panel.status == 'HIDDEN' %}
+                                    btn-primary
+                                {% else %}
+                                    btn-outline-primary
+                                {% endif %}"
+                                onclick="
+                                set_status.value='HIDDEN'; form.submit();
+                            ">Hidden</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Check the Panelist perspective (depends on status of the panel)</td>
+                    <td>
+                        <a class="btn btn-outline-primary"
+                           href="{% url 'tasex:panel' panel.id %}"
+                           target="_blank"
+                        >
+                            Open in new tab
+                        </a>
+                        <a class="btn btn-outline-primary openQrModal"
+                           data-id="{% url 'tasex:panel-qr' panel.id %}"
+                           data-bs-toggle="modal"
+                           data-bs-target="#QR">QR link</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Generate random answers for remaining Panelists in a way suggesting that samples are</td>
+                    <td>
+                        <form action="{% url 'demo:randomize_panel' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="mode">
+                            <button
+                                class="btn btn-outline-primary {% if is_panel_full %}disabled{% endif %}"
+                                onclick="mode.value='different'; form.submit();"
+                                data-bs-toggle="modal"
+                                data-bs-target="#fakeModal"
+                            >
+                            Significantly different
+                            </button>
+
+                            <button
+                                class="btn btn-outline-primary {% if is_panel_full %}disabled{% endif %}"
+                                onclick="mode.value='indistinguishable'; form.submit();"
+                                data-bs-toggle="modal"
+                                data-bs-target="#fakeModal"
+                            >
+                            Indistinguishable
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Reset the panel and start from scratch</td>
+                    <td>
+                        <a
+                            class="btn btn-outline-danger"
+                            href="{% url 'demo:reset_panel' %}"
+                        >Reset</a>
+
+                    </td>
+                </tr>
+            </table>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+{#    Modals#}
+
+
+
+{% endblock content %}

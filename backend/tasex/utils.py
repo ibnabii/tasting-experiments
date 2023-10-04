@@ -44,12 +44,15 @@ class PanelResult:
             self.percent_correct = round(self.correct / self.participants * 100)
         else:
             self.percent_correct = 0
-        test_result = stats.binomtest(
-            self.correct,
-            self.participants,
-            p=1/3,
-            alternative="greater")
-        self.p_value = test_result.pvalue
+        if self.participants:
+            test_result = stats.binomtest(
+                self.correct,
+                self.participants,
+                p=1/3,
+                alternative="greater")
+            self.p_value = test_result.pvalue
+        else:
+            self.p_value = 1
 
         self.plot_correct = generate_pie_chart({
             'title': f'Poprawnie zidentyfkowane próbki (P-value = {self.p_value:.3f})',

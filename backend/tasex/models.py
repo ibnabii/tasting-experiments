@@ -7,6 +7,8 @@ from django.urls import reverse
 
 
 class Product(models.Model):
+    # TODO: change id to uuid
+    # id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
     brew_id = models.CharField(max_length=20, help_text='Internal brewing ID, not shown to panelists')
     internal_name = models.CharField(max_length=100, help_text='Internal name, not shown to panelists')
     name = models.CharField(max_length=100, help_text='Name of the product shown to panelists')
@@ -96,6 +98,7 @@ class Panel(models.Model):
     def save(self, *args, **kwargs):
         # Automatically creates samples for the panel upon it's creation
         if self._state.adding:
+            super().save(*args, **kwargs)
             # generate random ids for all the samples
             sample_codes = sample(range(1000, 10000), self.planned_panelists * 3)
             # randomly decide how to assign samples to products
@@ -118,8 +121,7 @@ class Panel(models.Model):
             orig = Panel.objects.get(pk=self.pk)
             if self.planned_panelists != orig.planned_panelists:
                 raise ValidationError('Cannot change "planned_panelists" field')
-
-        super().save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('tasex:panel', kwargs={"pk": self.id})
@@ -161,6 +163,8 @@ class Result(models.Model):
             .values_list('id', flat=True)[0]
         )
         self.is_correct = odd_sample == self.odd_sample.id
+        self.sample_set.is_used = True
+        self.sample_set.save()
         super().save(*args, **kwargs)
 
 

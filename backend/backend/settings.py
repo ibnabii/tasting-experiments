@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from django.contrib.messages import constants as messages
 from django.core.management.utils import get_random_secret_key
 import environ
 import matplotlib
@@ -23,8 +24,15 @@ SECRET_KEY = env("SECRET_KEY", default=get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=['127.0.0.1'])
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=['http://127.0.0.1'])
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=['127.0.0.1', 'localhost']
+)
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=['http://127.0.0.1', 'http://localhost']
+)
+
 
 # Application definition
 
@@ -38,7 +46,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'tasex',
-    'bootstrap5'
+    'bootstrap5',
+    'django_bootstrap_icons',
+    'demo',
 ]
 
 MIDDLEWARE = [
@@ -115,7 +125,8 @@ LANGUAGE_CODE = 'en'
 TIME_ZONE = 'UTC'
 
 # USE_I18N = False
-# DATETIME_FORMAT = 'Y-m-d H:i:s'
+USE_L10N = False
+DATETIME_FORMAT = 'Y-m-d H:i:s'
 USE_TZ = False
 
 
@@ -123,10 +134,24 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# bootstrap messages
+MESSAGE_TAGS = {
+        messages.DEBUG: 'alert-secondary',
+        messages.INFO: 'alert-info',
+        messages.SUCCESS: 'alert-success',
+        messages.WARNING: 'alert-warning',
+        messages.ERROR: 'alert-danger',
+ }
+
+BOOTSTRAP5 = {
+    'css_url': '/static/bootstrap.min.css',
+}
