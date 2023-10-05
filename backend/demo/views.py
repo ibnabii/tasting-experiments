@@ -66,8 +66,8 @@ class GeneratePanelAnswersView(RedirectView, SetOwnPanelTabView):
         mode = request.POST.get('mode')
         panel = get_session_panel(request.session.session_key)
         if mode == 'different':
-            probability = 0.95
+            probability = 0.66
         else:
             probability = 0.33
-        create_panel_results(panel, probability, (0.7, 0.1, 0.2))
+        create_panel_results(panel, probability, (0.6, 0.1, 0.3))
         return super().post(request, *args, **kwargs)

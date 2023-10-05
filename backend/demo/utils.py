@@ -158,7 +158,7 @@ def create_demo_results():
             value=panel.id
         )
         create_demo_panel_questions(panel)
-        create_panel_results(panel, 0.9 if demo_result == DEMO_PANEL_RESULTS_SIGNIFICANT_KEY else 0.33)
+        create_panel_results(panel, 0.6 if demo_result == DEMO_PANEL_RESULTS_SIGNIFICANT_KEY else 0.33)
 
 
 def create_demo_panel_questions(panel):
@@ -322,12 +322,12 @@ def get_odd_sample(sample_set, probability=0.33):
         samples
         .values('product_id')
         .annotate(cnt=Count('product_id'))
+        .filter(cnt=1)
         .values_list('product_id', flat=True)[0]
     )
-    return choice(
-        (samples.filter(product_id=odd_product).first(), samples.exclude(product_id=odd_product).first()),
-        p=(probability, 1-probability)
-    )
+    a = (samples.filter(product_id=odd_product).first(), samples.exclude(product_id=odd_product).first())
+    p = (probability, 1 - probability)
+    return choice(a, p=p)
 
 
 def create_panel_results(panel, probability_correct=0.33, probabilities=(0.4, 0.2, 0.4)):
