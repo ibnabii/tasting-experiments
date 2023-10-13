@@ -8,9 +8,9 @@ Correct answers:
 ({{ panel_result.percent_correct }}%)
 <br/>
 P-value: {{ panel_result.p_value }} <br/>
-<img src="data:image/png;base64,{{ panel_result.plot_correct }}" alt="Plot with result data">
+<img src="data:image/png;base64,{{ panel_result.plot_correct }}" alt="Plot with result data"  class="img-fluid">
 
 {% for plot in survey_plots.plots %}
-    <img src="data:image/png;base64,{{ plot }}" alt="Another plot">
+    <img src="data:image/png;base64,{{ plot }}" alt="Another plot" class="img-fluid">
 {% endfor %}
 {% endblock content %}
