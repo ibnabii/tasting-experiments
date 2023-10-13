@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Triangle Testing Demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {% load static %}
+
+</head>
+<body class="bg-light-subtle">
+
+    {% include 'demo/messages.html' %}
+
+    <div class="container p-5 text-bg-primary text-center rounded-top shadow">
+        <h1>
+            {% block title %}
+
+            {% endblock %}
+        </h1>
+    </div>
+
+
+
+
+    <div  class="container bg-light h-100 p-3 shadow">
+
+        {% block content %}
+
+        {% endblock %}
+    </div>
+
+</body>
+</html>

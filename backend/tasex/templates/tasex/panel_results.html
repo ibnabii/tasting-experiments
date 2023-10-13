@@ -1,5 +1,8 @@
-<h1>Results</h1>
+{% extends 'tasex/panel_base.html' %}
+{% block title %}
 Panel <b>{{ panel.experiment.title }}</b> results<br/>
+{% endblock title %}
+{% block content %}
 Correct answers:
 {{ panel_result.correct }} / {{ panel_result.participants }}
 ({{ panel_result.percent_correct }}%)
@@ -10,3 +13,4 @@ P-value: {{ panel_result.p_value }} <br/>
 {% for plot in survey_plots.plots %}
     <img src="data:image/png;base64,{{ plot }}" alt="Another plot">
 {% endfor %}
+{% endblock content %}

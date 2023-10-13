@@ -160,6 +160,18 @@ class PanelStep1(FormView):
     def get_form_class(self):
         return FORM_CLASSES.get(self.panel_state.step)
 
+
+    def get_context_data(self, **kwargs):
+        form_titles = {
+            1: "Sprawdzamy, czy masz właściwy zestaw próbek",
+            2: "Sprawdzamy, czy masz właściwy zestaw próbek",
+            3: "Dwie próbki są identyczne. Jednak próbka jest inna - która?",
+        }
+        context = super().get_context_data(**kwargs)
+        context['title'] = form_titles.get(self.panel_state.step)
+        print(self.panel_state)
+        return context
+
     def setup(self, request, *args, **kwargs):
         self.panel_id = kwargs.get('pk')
         self.panel_state = PanelState(**request.session.get('panels').get(self.panel_id))

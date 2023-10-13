@@ -1,24 +1,33 @@
-<h3>Produkty, które oceniałeś:</h3>
-<table border="1">
-    <tr><th>Produkt</th><th>A</th><th>B</th></tr>
-    <tr><th>Próbki</th>
-        <td>
-            {% for product in product_a %}
-                {{ product }} <br/>
-            {% endfor%}
-        </td>
-        <td>
-            {% for product in product_b %}
-                {{ product }} <br/>
-            {% endfor%}
-        </td></tr>
-</table>
-<h3>Odpowiedz na poniższe pytania:</h3>
+{% extends 'tasex/panel_base.html' %}
+{% block title %}
+Pytania dodatkowe
+{% endblock title %}
+{% block content %}
+    <h3>Produkty, które oceniałeś:</h3>
+    <table border="1" class="table">
+        <tr><th>Produkt</th><th>A</th><th>B</th></tr>
+        <tr><th>Próbki</th>
+            <td>
+                {% for product in product_a %}
+                    {{ product }} <br/>
+                {% endfor%}
+            </td>
+            <td>
+                {% for product in product_b %}
+                    {{ product }} <br/>
+                {% endfor%}
+            </td></tr>
+    </table>
+    <h3>Odpowiedz na poniższe pytania:</h3>
 
-<form  method="post">
-    {% csrf_token %}
+    <form  method="post">
+        {% csrf_token %}
 
-        {{ form.as_div }}
+            {{ form.as_p }}
 
-    <input type="submit" value="Submit">
-</form>
+        <div>
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </div>
+
+    </form>
+{% endblock content %}

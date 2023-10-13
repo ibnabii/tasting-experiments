@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 
 from .models import Product, Experiment, Panel, Sample, PanelQuestion
-
+from .widgets import VerticalButtonSelect
 
 class InternalNameChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -60,7 +60,8 @@ class PanelQuestionsForm(forms.Form):
             self.fields[question.id] = forms.ChoiceField(
                 required=True,
                 choices=question.scale.points.values_list('code', 'text'),
-                widget=forms.RadioSelect,
+                # widget=forms.RadioSelect,
+                widget=VerticalButtonSelect,
                 label=question.question_text
             )
 
@@ -98,7 +99,8 @@ class SingleSampleForm(GenericPanelForm):
 
 class CheckSampleSetForm(GenericPanelForm):
     are_samples_correct = forms.ChoiceField(
-        widget=forms.RadioSelect,
+        # widget=forms.RadioSelect,
+        widget=VerticalButtonSelect,
         choices=(
             (False, 'Nie'),
             (True, 'Tak'),
@@ -110,13 +112,14 @@ class CheckSampleSetForm(GenericPanelForm):
         samples = Sample.objects.filter(sample_set_id=self.panel_state.sample_set).values_list('code', flat=True)
         self.fields['are_samples_correct'].label = mark_safe(
             f'Sprawdź, czy Twoje próbki mają poniższe numery: <h4>{", ".join(samples)}</h4>' +
-            'Czy <b>wszystkie</b> numery się zgadzają?'
+            'Czy <b>wszystkie</b> numery się zgadzają?<br/>'
         )
 
 
 class SelectOddSampleForm(GenericPanelForm):
     odd_sample = forms.ChoiceField(
-        widget=forms.RadioSelect,
+        # widget=forms.RadioSelect,
+        widget=VerticalButtonSelect,
         label=mark_safe('Która z próbek jest  <b>inna</b> od pozostałych?'
                         '<br/>Wybierz dowolną, jeśli Twoim zdaniem są takie same')
     )

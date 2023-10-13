@@ -1,5 +1,12 @@
+{% extends 'tasex/panel_base.html' %}
+{% load static %}
+{% block title %}
+{{ title }}
+{% endblock title %}
+{% block content %}
 <form  method="post">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
+    {{ form.as_p }}
+    <input type="submit" value="Submit" class="btn btn-primary">
 </form>
+{% endblock content %}
