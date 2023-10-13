@@ -1,5 +1,7 @@
 import qrcode
+import structlog
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest, PermissionDenied
 # from django.db.models import Q
@@ -13,6 +15,7 @@ from .forms import FORM_CLASSES
 from .models import Experiment, Panel, Sample, SampleSet, Product, Result
 from .serializers import ExperimentSerializer, PanelSerializer
 from .utils import PanelResult
+
 
 class ExperimentViewSet(viewsets.ModelViewSet):
     serializer_class = ExperimentSerializer
@@ -154,6 +157,9 @@ class AnonymousPanelView(DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         # decide what to serve depending on panel status
+        log = settings.LOGGER.bind(panel=str(self.get_object().id))
+        structlog.contextvars.bind_contextvars(panel=str(self.get_object().id))
+        structlog.contextvars.bind_contextvars(blabla='blah-blah')
         match self.get_object().status:
             # this condition is the equivalent of defining queryset to skip HIDDEN
             case Panel.PanelStatus.HIDDEN:
@@ -161,6 +167,8 @@ class AnonymousPanelView(DetailView):
             case Panel.PanelStatus.PLANNED:
                 self.template_name = 'tasex/panel_planned.html'
             case Panel.PanelStatus.PRESENTING_RESULTS:
+                log.debug('Anonymous user access panel results', status=Panel.PanelStatus.PRESENTING_RESULTS)
+                settings.LOGGER.debug('Anonymous user access panel results', status=Panel.PanelStatus.PRESENTING_RESULTS)
                 return ResultsView.as_view()(request, *args, **kwargs)
 
             case Panel.PanelStatus.ACCEPTING_ANSWERS:
@@ -191,8 +199,10 @@ class AnonymousPanelView(DetailView):
 class PanelView(DetailView):
 
     def dispatch(self, request, *args, **kwargs):
+
         # serve another view if dealing with anonymous user
         if request.user.is_anonymous:
+            settings.LOGGER.debug('Anonymous user access dispatcher')
             return AnonymousPanelView.as_view()(request, *args, **kwargs)
         else:
             return AdminPanelView.as_view()(request, *args, **kwargs)

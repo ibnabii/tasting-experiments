@@ -3,7 +3,9 @@ from pathlib import Path
 from django.core.management.utils import get_random_secret_key
 import environ
 import matplotlib
+import structlog
 
+LOGGER = structlog.get_logger()
 # use non-interactive backend for generating plots
 matplotlib.use('agg')
 
