@@ -268,7 +268,7 @@ class WaitForFinishView(DetailView):
         # add panel/experiment details if panel says so
         if panel.show_exp_description == panel.ShowExperimentDescription.AFTER_TASTING:
             context["products"] = (Sample.objects
-                                   .filter(sample_set__id=result.sample_set.id).order_by('product', 'sample_code')
+                                   .filter(sample_set__id=result.sample_set.id).order_by('product', 'code')
                                    .values('product__description', 'code')
                                    )
 
