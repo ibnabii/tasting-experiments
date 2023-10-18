@@ -2,7 +2,7 @@ import qrcode
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
-# from django.db.models import Q
+from django.db import models
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import reverse, get_object_or_404
 from django.views.generic import DetailView, FormView, ListView, RedirectView
@@ -160,7 +160,6 @@ class PanelStep1(FormView):
     def get_form_class(self):
         return FORM_CLASSES.get(self.panel_state.step)
 
-
     def get_context_data(self, **kwargs):
         form_titles = {
             1: "Sprawdzamy, czy masz właściwy zestaw próbek",
@@ -239,6 +238,34 @@ class PanelQuestionsView(FormView):
         )
 
 
+class WaitForFinishView(DetailView):
+    model = Panel
+    template_name = 'tasex/panel_wait_for_finish.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        result_id = self.request.session.get('panels').get(str(self.get_object().id)).get('result')
+        result = Result.objects.get(id=result_id)
+        is_correct = result.is_correct
+        context["is_correct"] = is_correct
+        odd_product = (
+            Sample.objects
+            .filter(sample_set=result.sample_set)
+            .values('product_id')
+            .annotate(cnt=models.Count('product_id'))
+            .filter(cnt=1)
+            .values_list('product_id', flat=True)[0]
+        )
+        odd_sample = (
+            Sample.objects
+            .filter(sample_set=result.sample_set)
+            .get(product_id=odd_product)
+        )
+        context["correct_sample"] = odd_sample.code
+        context["user_sample"] = result.odd_sample.code
+        return context
+
+
 class AnonymousPanelView(DetailView):
     model = Panel
     template_name = 'tasex/panel_closed.html'
@@ -249,7 +276,6 @@ class AnonymousPanelView(DetailView):
     def dispatch(self, request, *args, **kwargs):
         # decide what to serve depending on panel status
         match self.get_object().status:
-            # this condition is the equivalent of defining queryset to skip HIDDEN
             case Panel.PanelStatus.HIDDEN:
                 raise PermissionDenied
             case Panel.PanelStatus.PLANNED:
@@ -277,7 +303,7 @@ class AnonymousPanelView(DetailView):
                 elif step == len(FORM_CLASSES) + 1:
                     return PanelQuestionsView.as_view()(request, *args, **kwargs)
                 else:
-                    self.template_name = 'tasex/panel_wait_for_finish.html'
+                    return WaitForFinishView.as_view()(request, *args, **kwargs)
             case _:
                 # for debug
                 raise BadRequest(f'I do not know what to do with panel status {self.get_object().status}')

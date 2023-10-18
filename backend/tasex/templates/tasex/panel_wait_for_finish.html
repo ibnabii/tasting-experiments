@@ -3,3 +3,17 @@
 Panel <b>{{ panel.experiment.title }}</b> is still accepting responses.
 Please wait until panel closes to see the results.
 {% endblock title %}
+
+{% block content %}
+    {% if is_correct %}
+        <div class="alert alert-success">
+            You have <strong>correctly</strong> identified the odd sample.
+        </div>
+    {% else %}
+        <div class="alert alert-danger">
+            You have selected <strong>wrong</strong> sample.
+        </div>
+        Correct sample number: {{ correct_sample }}</br>
+    {% endif %}
+    You have selected sample number: {{ user_sample }}
+{% endblock content %}
