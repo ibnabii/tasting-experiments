@@ -129,6 +129,7 @@ class SampleAdmin(admin.ModelAdmin):
         'product'
     )
     list_filter = ("sample_set", "product")
+    ordering = ("sample_set", "product")
 
 
 @admin.register(Result)
