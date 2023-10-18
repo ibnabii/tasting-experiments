@@ -244,7 +244,8 @@ class WaitForFinishView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        result_id = self.request.session.get('panels').get(str(self.get_object().id)).get('result')
+        panel = self.get_object()
+        result_id = self.request.session.get('panels').get(str(panel.id)).get('result')
         result = Result.objects.get(id=result_id)
         is_correct = result.is_correct
         context["is_correct"] = is_correct
@@ -263,6 +264,14 @@ class WaitForFinishView(DetailView):
         )
         context["correct_sample"] = odd_sample.code
         context["user_sample"] = result.odd_sample.code
+
+        # add panel/experiment details if panel says so
+        if panel.show_exp_description == panel.ShowExperimentDescription.AFTER_TASTING:
+            context["products"] = (Sample.objects
+                                   .filter(sample_set__id=result.sample_set.id).order_by('product')
+                                   .values('product__description', 'code')
+                                   )
+
         return context
 
 

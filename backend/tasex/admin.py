@@ -128,6 +128,7 @@ class SampleAdmin(admin.ModelAdmin):
         'code',
         'product'
     )
+    list_filter = ("sample_set", "product")
 
 
 @admin.register(Result)
@@ -173,14 +174,14 @@ class PanelQuestionAdmin(admin.ModelAdmin):
 class AnswerAdmin(admin.ModelAdmin):
     pass
 # for debug: check session data in admin module
-# from django.contrib.sessions.models import Session
-#
-#
-# @admin.register(Session)
-# class SessionAdmin(admin.ModelAdmin):
-#     def _session_data(self, obj):
-#         return obj.get_decoded()
-#
-#     list_display = ['session_key', '_session_data', 'expire_date']
-#     ordering = ['-expire_date']
+from django.contrib.sessions.models import Session
+
+
+@admin.register(Session)
+class SessionAdmin(admin.ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+
+    list_display = ['session_key', '_session_data', 'expire_date']
+    ordering = ['-expire_date']
 

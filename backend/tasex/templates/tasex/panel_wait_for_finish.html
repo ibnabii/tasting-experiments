@@ -1,6 +1,6 @@
 {% extends 'tasex/panel_base.html' %}
 {% block title %}
-Panel <b>{{ panel.experiment.title }}</b> is still accepting responses.
+Panel <b>{{ panel.description }}</b> is still accepting responses.
 Please wait until panel closes to see the results.
 {% endblock title %}
 
@@ -16,4 +16,19 @@ Please wait until panel closes to see the results.
         Correct sample number: {{ correct_sample }}</br>
     {% endif %}
     You have selected sample number: {{ user_sample }}
+
+    {% if products %}
+        <h5 class="display-5">Samples you've judged:</h5>
+        <table class="table table-hover">
+            <tr>
+                <th>Product</th><th>Sample code</th>
+            </tr>
+            {% for item in products %}
+                <tr>
+                    <td>{{ item.product__description }}</td>
+                    <td>{{ item.code }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 {% endblock content %}
