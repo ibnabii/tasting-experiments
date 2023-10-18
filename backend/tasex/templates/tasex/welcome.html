@@ -3,12 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Tasting Experiments</title>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 </head>
 <body>
-<h1 align="center">Tasting Experiments</h1>
+<h1 align="center" class="display-1">Tasting Experiments</h1>
 {% load static %}
 <center>
     <img src="{% static 'tasex/logo.png' %}" align="center">
-</center>
+</center><br/>
+<div align="center">
+    <a href="#" class="btn btn-outline-primary disabled">Login</a>
+    <a href="{% url 'demo:index' %}" class="btn btn-outline-primary">Demo</a>
+</div>
+
+
 </body>
 </html>
