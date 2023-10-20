@@ -9,7 +9,7 @@
     <tr><th>Lp</th><th>{{ products.0.brew_id }}</th></tr>
 </thead>
 <tbody>
-{% for sample in samplesA|dictsort:'code' %}
+{% for sample in samplesA %}
     <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ sample.code }}</td>
@@ -23,7 +23,7 @@
     <tr><th>Lp</th><th>{{ products.1.brew_id }}</th></tr>
 </thead>
 <tbody>
-{% for sample in samplesB|dictsort:'code' %}
+{% for sample in samplesB %}
     <tr>
         <td>{{ forloop.counter }}</td>
         <td>{{ sample.code }}</td>

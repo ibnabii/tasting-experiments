@@ -47,11 +47,15 @@ class SamplePreparationView(LoginRequiredMixin, ListView):
         context['samplesA'] = (
             Sample.objects
             .filter(product_id=context['products'][0])
-            .filter(sample_set__panel_id=self.kwargs['pk']))
+            .filter(sample_set__panel_id=self.kwargs['pk'])
+            .order_by('sample_set__id')
+        )
         context['samplesB'] = (
             Sample.objects
             .filter(product_id=context['products'][1])
-            .filter(sample_set__panel_id=self.kwargs['pk']))
+            .filter(sample_set__panel_id=self.kwargs['pk'])
+            .order_by('sample_set__id')
+        )
 
         return context
 
