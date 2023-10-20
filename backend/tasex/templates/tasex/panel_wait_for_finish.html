@@ -18,7 +18,9 @@ Please wait until panel closes to see the results.
     You have selected sample number: {{ user_sample }}
 
     {% if products %}
-        <h5 class="display-5">Samples you've judged:</h5>
+        <h5 class="display-6">Experiment description:</h5>
+        {{ panel.experiment.description }}
+        <h5 class="display-6">Samples you've judged:</h5>
         <table class="table table-hover">
             <tr>
                 <th>Product</th><th>Sample code</th>
