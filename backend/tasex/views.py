@@ -168,7 +168,7 @@ class PanelStep1(FormView):
         form_titles = {
             1: "Sprawdzamy, czy masz właściwy zestaw próbek",
             2: "Sprawdzamy, czy masz właściwy zestaw próbek",
-            3: "Dwie próbki są identyczne. Jednak próbka jest inna - która?",
+            3: "Dwie próbki są identyczne. Jedna próbka jest inna - która?",
         }
         context = super().get_context_data(**kwargs)
         context['title'] = form_titles.get(self.panel_state.step)

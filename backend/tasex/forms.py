@@ -80,7 +80,9 @@ class GenericPanelForm(forms.Form):
 
 
 class SingleSampleForm(GenericPanelForm):
-    code = forms.IntegerField(label='Podaj numer dowolnej próbki')
+    code = forms.IntegerField(
+        label='Podaj numer dowolnej z otrzymanych próbek, abyśmy mogli sprawdzić czy masz dobry zestaw'
+    )
 
     def clean_code(self):
         data = self.cleaned_data["code"]
